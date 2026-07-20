@@ -12,8 +12,8 @@ const DEFAULT_CONFIG: Configuracion = {
   },
   techos: {
     tipos: [
-      { id: '1', nombre: 'Estándar', largo: 244, ancho: 122, precioM2: 35 },
-      { id: '2', nombre: 'PVC', largo: 244, ancho: 122, precioM2: 55 },
+      { id: '1', nombre: 'Estándar', largo: 244, ancho: 122, precioLamina: 27, precioM2: 15 },
+      { id: '2', nombre: 'PVC', largo: 244, ancho: 122, precioLamina: 45, precioM2: 28 },
     ],
   },
   productos: {

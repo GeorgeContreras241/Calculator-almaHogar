@@ -18,11 +18,13 @@ export function ConfigTechos() {
   const [nombre, setNombre] = useState("")
   const [largo, setLargo] = useState("")
   const [ancho, setAncho] = useState("")
+  const [precioLamina, setPrecioLamina] = useState("")
   const [precioM2, setPrecioM2] = useState("")
   const [editandoId, setEditandoId] = useState<string | null>(null)
   const [editNombre, setEditNombre] = useState("")
   const [editLargo, setEditLargo] = useState("")
   const [editAncho, setEditAncho] = useState("")
+  const [editPrecioLamina, setEditPrecioLamina] = useState("")
   const [editPrecioM2, setEditPrecioM2] = useState("")
 
   useEffect(() => {
@@ -32,20 +34,23 @@ export function ConfigTechos() {
   const handleAgregar = () => {
     const l = parseFloat(largo)
     const a = parseFloat(ancho)
-    const p = parseFloat(precioM2)
-    if (!nombre.trim() || isNaN(l) || isNaN(a) || isNaN(p)) return
-    if (l <= 0 || a <= 0 || p < 0) return
+    const pl = parseFloat(precioLamina)
+    const pm = parseFloat(precioM2)
+    if (!nombre.trim() || isNaN(l) || isNaN(a) || isNaN(pl) || isNaN(pm)) return
+    if (l <= 0 || a <= 0 || pl < 0 || pm < 0) return
 
     const nuevaConfig = agregarTipoTecho({
       nombre: nombre.trim(),
       largo: l,
       ancho: a,
-      precioM2: p,
+      precioLamina: pl,
+      precioM2: pm,
     })
     setConfig(nuevaConfig)
     setNombre("")
     setLargo("")
     setAncho("")
+    setPrecioLamina("")
     setPrecioM2("")
   }
 
@@ -59,6 +64,7 @@ export function ConfigTechos() {
     setEditNombre(tipo.nombre)
     setEditLargo(tipo.largo.toString())
     setEditAncho(tipo.ancho.toString())
+    setEditPrecioLamina(tipo.precioLamina.toString())
     setEditPrecioM2(tipo.precioM2.toString())
   }
 
@@ -66,25 +72,19 @@ export function ConfigTechos() {
     if (!editandoId) return
     const l = parseFloat(editLargo)
     const a = parseFloat(editAncho)
-    const p = parseFloat(editPrecioM2)
-    if (!editNombre.trim() || isNaN(l) || isNaN(a) || isNaN(p)) return
+    const pl = parseFloat(editPrecioLamina)
+    const pm = parseFloat(editPrecioM2)
+    if (!editNombre.trim() || isNaN(l) || isNaN(a) || isNaN(pl) || isNaN(pm)) return
 
     const nuevaConfig = actualizarTipoTecho(editandoId, {
       nombre: editNombre.trim(),
       largo: l,
       ancho: a,
-      precioM2: p,
+      precioLamina: pl,
+      precioM2: pm,
     })
     setConfig(nuevaConfig)
     setEditandoId(null)
-  }
-
-  const handleCancelarEdicion = () => {
-    setEditandoId(null)
-  }
-
-  const precioPorLamina = (tipo: TipoTecho) => {
-    return (tipo.largo * tipo.ancho / 10000) * tipo.precioM2
   }
 
   return (
@@ -93,49 +93,26 @@ export function ConfigTechos() {
         <CardTitle className="text-lg">Configurar Techos</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-3">
           <div className="space-y-2">
-            <Label htmlFor="nombre-techo">Nombre</Label>
-            <Input
-              id="nombre-techo"
-              placeholder="Ej: Estándar"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-            />
+            <Label>Nombre</Label>
+            <Input placeholder="Ej: Estándar" value={nombre} onChange={(e) => setNombre(e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="largo-techo">Largo lámina (cm)</Label>
-            <Input
-              id="largo-techo"
-              type="number"
-              placeholder="244"
-              value={largo}
-              onChange={(e) => setLargo(e.target.value)}
-              min="1"
-            />
+            <Label>Largo lámina (cm)</Label>
+            <Input type="number" placeholder="244" value={largo} onChange={(e) => setLargo(e.target.value)} min="1" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="ancho-techo">Ancho lámina (cm)</Label>
-            <Input
-              id="ancho-techo"
-              type="number"
-              placeholder="122"
-              value={ancho}
-              onChange={(e) => setAncho(e.target.value)}
-              min="1"
-            />
+            <Label>Ancho lámina (cm)</Label>
+            <Input type="number" placeholder="122" value={ancho} onChange={(e) => setAncho(e.target.value)} min="1" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="precio-techo">Precio por m² ($)</Label>
-            <Input
-              id="precio-techo"
-              type="number"
-              placeholder="35"
-              value={precioM2}
-              onChange={(e) => setPrecioM2(e.target.value)}
-              min="0"
-              step="1"
-            />
+            <Label>Precio lámina ($)</Label>
+            <Input type="number" placeholder="27" value={precioLamina} onChange={(e) => setPrecioLamina(e.target.value)} min="0" step="1" />
+          </div>
+          <div className="space-y-2">
+            <Label>Precio m² ($)</Label>
+            <Input type="number" placeholder="15" value={precioM2} onChange={(e) => setPrecioM2(e.target.value)} min="0" step="1" />
           </div>
           <div className="flex items-end">
             <Button onClick={handleAgregar} className="w-full gap-1">
@@ -144,67 +121,48 @@ export function ConfigTechos() {
           </div>
         </div>
 
-        <div className="border rounded-lg divide-y">
+        <div className="border border-[var(--color-border)] rounded-lg divide-y divide-[var(--color-border)]">
           {config.techos.tipos.length === 0 ? (
             <p className="p-4 text-sm text-[var(--color-muted-foreground)] text-center">
               No hay tipos de techo configurados
             </p>
           ) : (
             config.techos.tipos.map((tipo) => (
-              <div key={tipo.id} className="p-3 flex items-center gap-3 text-sm">
+              <div key={tipo.id} className="p-3 flex items-center gap-2 text-sm flex-wrap">
                 {editandoId === tipo.id ? (
-                  <>
-                    <Input
-                      value={editNombre}
-                      onChange={(e) => setEditNombre(e.target.value)}
-                      className="w-32"
-                      placeholder="Nombre"
-                    />
-                    <Input
-                      type="number"
-                      value={editLargo}
-                      onChange={(e) => setEditLargo(e.target.value)}
-                      className="w-20"
-                      placeholder="Largo"
-                    />
-                    <span className="text-muted-foreground">×</span>
-                    <Input
-                      type="number"
-                      value={editAncho}
-                      onChange={(e) => setEditAncho(e.target.value)}
-                      className="w-20"
-                      placeholder="Ancho"
-                    />
-                    <span className="text-muted-foreground">cm - $</span>
-                    <Input
-                      type="number"
-                      value={editPrecioM2}
-                      onChange={(e) => setEditPrecioM2(e.target.value)}
-                      className="w-24"
-                      placeholder="Precio/m²"
-                    />
-                    <span className="text-xs text-muted-foreground">/m²</span>
-                    <Button size="icon" variant="ghost" onClick={handleGuardarEdicion}>
-                      <Check className="w-4 h-4 text-green-600" />
-                    </Button>
-                    <Button size="icon" variant="ghost" onClick={handleCancelarEdicion}>
-                      <X className="w-4 h-4 text-red-600" />
-                    </Button>
-                  </>
+                  <div className="grid grid-cols-2 sm:grid-cols-6 gap-2 w-full">
+                    <Input value={editNombre} onChange={(e) => setEditNombre(e.target.value)} placeholder="Nombre" />
+                    <Input type="number" value={editLargo} onChange={(e) => setEditLargo(e.target.value)} placeholder="Largo" />
+                    <Input type="number" value={editAncho} onChange={(e) => setEditAncho(e.target.value)} placeholder="Ancho" />
+                    <Input type="number" value={editPrecioLamina} onChange={(e) => setEditPrecioLamina(e.target.value)} placeholder="$ Lámina" />
+                    <Input type="number" value={editPrecioM2} onChange={(e) => setEditPrecioM2(e.target.value)} placeholder="$ m²" />
+                    <div className="flex gap-1">
+                      <Button size="icon" variant="ghost" className="h-9 w-9" onClick={handleGuardarEdicion}>
+                        <Check className="w-4 h-4 text-green-500" />
+                      </Button>
+                      <Button size="icon" variant="ghost" className="h-9 w-9" onClick={() => setEditandoId(null)}>
+                        <X className="w-4 h-4 text-red-500" />
+                      </Button>
+                    </div>
+                  </div>
                 ) : (
                   <>
-                    <span className="font-medium flex-1">{tipo.nombre}</span>
-                    <span className="text-muted-foreground">{tipo.largo}×{tipo.ancho}</span>
-                    <span className="font-mono">{formatearMoneda(tipo.precioM2)}/m²</span>
-                    <span className="text-xs text-muted-foreground border rounded px-2 py-0.5">
-                      {formatearMoneda(precioPorLamina(tipo))}/lámina
+                    <span className="font-medium flex-1 min-w-[80px]">{tipo.nombre}</span>
+                    <span className="text-[var(--color-muted-foreground)] text-xs">{tipo.largo}×{tipo.ancho}</span>
+                    <span className="font-mono text-xs border border-[var(--color-border)] rounded px-2 py-0.5">
+                      {formatearMoneda(tipo.precioLamina)}/lámina
                     </span>
-                    <Button size="icon" variant="ghost" onClick={() => handleEditar(tipo)}>
-                      <Edit2 className="w-4 h-4" />
-                    </Button>
-                    <Button size="icon" variant="ghost" onClick={() => handleEliminar(tipo.id)}>
-                      <Trash2 className="w-4 h-4 text-red-500" />
-                    </Button>
+                    <span className="font-mono text-xs border border-[var(--color-border)] rounded px-2 py-0.5">
+                      {formatearMoneda(tipo.precioM2)}/m²
+                    </span>
+                    <div className="flex gap-1">
+                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleEditar(tipo)}>
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleEliminar(tipo.id)}>
+                        <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                      </Button>
+                    </div>
                   </>
                 )}
               </div>

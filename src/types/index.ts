@@ -11,6 +11,7 @@ export interface TipoTecho {
   nombre: string
   largo: number
   ancho: number
+  precioLamina: number
   precioM2: number
 }
 
