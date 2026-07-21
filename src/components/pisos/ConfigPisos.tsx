@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react"
-import { Button } from "./ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
-import { Input } from "./ui/input"
-import { Label } from "./ui/label"
+import { Button } from "../ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
+import { Input } from "../ui/input"
+import { Label } from "../ui/label"
 import {
   cargarConfiguracion,
   agregarTallaPiso,
   eliminarTallaPiso,
   actualizarTallaPiso,
   formatearMoneda,
-} from "../lib/formulas"
-import type { Configuracion, TallaPiso } from "../types"
+} from "../../lib/formulas"
+import type { Configuracion, TallaPiso } from "../../types"
 import { Plus, Trash2, Edit2, Check, X } from "lucide-react"
 
 export function ConfigPisos() {

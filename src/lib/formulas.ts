@@ -1,4 +1,4 @@
-import type { Configuracion, TallaPiso, TipoTecho, Producto, ItemInventario } from '../types'
+import type { Configuracion, TallaPiso, TipoTecho, Producto } from '../types'
 
 const STORAGE_KEY = 'techos-pisos-config'
 
@@ -16,217 +16,103 @@ const DEFAULT_CONFIG: Configuracion = {
       { id: '2', nombre: 'PVC', largo: 244, ancho: 122, precioLamina: 45, precioM2: 28 },
     ],
   },
-  productos: {
-    productos: [],
-  },
-  inventario: {
-    items: [],
-  },
+  productos: { items: [] },
 }
 
 export function cargarConfiguracion(): Configuracion {
   try {
     const data = localStorage.getItem(STORAGE_KEY)
     if (!data) return DEFAULT_CONFIG
-    const parsed = JSON.parse(data)
+    const p = JSON.parse(data)
+    const viejos = p.productos?.productos || []
     return {
-      pisos: parsed.pisos || DEFAULT_CONFIG.pisos,
-      techos: parsed.techos || DEFAULT_CONFIG.techos,
-      productos: parsed.productos || { productos: [] },
-      inventario: parsed.inventario || { items: [] },
+      pisos: p.pisos || DEFAULT_CONFIG.pisos,
+      techos: p.techos || DEFAULT_CONFIG.techos,
+      productos: p.productos?.items ? p.productos : { items: viejos },
     }
-  } catch {
-    return DEFAULT_CONFIG
-  }
+  } catch { return DEFAULT_CONFIG }
 }
 
-export function guardarConfiguracion(config: Configuracion): void {
+function guardarConfiguracion(config: Configuracion): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(config))
 }
 
-export function agregarTallaPiso(talla: Omit<TallaPiso, 'id'>): Configuracion {
-  const config = cargarConfiguracion()
-  const nuevaTalla: TallaPiso = {
-    ...talla,
-    id: Date.now().toString(),
-  }
-  config.pisos.tallas.push(nuevaTalla)
-  guardarConfiguracion(config)
-  return config
+// Pisos
+export function agregarTallaPiso(t: Omit<TallaPiso, 'id'>): Configuracion {
+  const c = cargarConfiguracion()
+  c.pisos.tallas.push({ ...t, id: Date.now().toString() })
+  guardarConfiguracion(c); return c
 }
-
 export function eliminarTallaPiso(id: string): Configuracion {
-  const config = cargarConfiguracion()
-  config.pisos.tallas = config.pisos.tallas.filter((t) => t.id !== id)
-  guardarConfiguracion(config)
-  return config
+  const c = cargarConfiguracion()
+  c.pisos.tallas = c.pisos.tallas.filter((t) => t.id !== id)
+  guardarConfiguracion(c); return c
 }
-
 export function actualizarTallaPiso(id: string, datos: Omit<TallaPiso, 'id'>): Configuracion {
-  const config = cargarConfiguracion()
-  const index = config.pisos.tallas.findIndex((t) => t.id === id)
-  if (index !== -1) {
-    config.pisos.tallas[index] = { ...datos, id }
-  }
-  guardarConfiguracion(config)
-  return config
+  const c = cargarConfiguracion()
+  const i = c.pisos.tallas.findIndex((t) => t.id === id)
+  if (i !== -1) c.pisos.tallas[i] = { ...datos, id }
+  guardarConfiguracion(c); return c
 }
 
-export function agregarTipoTecho(tipo: Omit<TipoTecho, 'id'>): Configuracion {
-  const config = cargarConfiguracion()
-  const nuevoTipo: TipoTecho = {
-    ...tipo,
-    id: Date.now().toString(),
-  }
-  config.techos.tipos.push(nuevoTipo)
-  guardarConfiguracion(config)
-  return config
+// Techos
+export function agregarTipoTecho(t: Omit<TipoTecho, 'id'>): Configuracion {
+  const c = cargarConfiguracion()
+  c.techos.tipos.push({ ...t, id: Date.now().toString() })
+  guardarConfiguracion(c); return c
 }
-
 export function eliminarTipoTecho(id: string): Configuracion {
-  const config = cargarConfiguracion()
-  config.techos.tipos = config.techos.tipos.filter((t) => t.id !== id)
-  guardarConfiguracion(config)
-  return config
+  const c = cargarConfiguracion()
+  c.techos.tipos = c.techos.tipos.filter((t) => t.id !== id)
+  guardarConfiguracion(c); return c
 }
-
 export function actualizarTipoTecho(id: string, datos: Omit<TipoTecho, 'id'>): Configuracion {
-  const config = cargarConfiguracion()
-  const index = config.techos.tipos.findIndex((t) => t.id === id)
-  if (index !== -1) {
-    config.techos.tipos[index] = { ...datos, id }
-  }
-  guardarConfiguracion(config)
-  return config
+  const c = cargarConfiguracion()
+  const i = c.techos.tipos.findIndex((t) => t.id === id)
+  if (i !== -1) c.techos.tipos[i] = { ...datos, id }
+  guardarConfiguracion(c); return c
 }
 
-export function formatearMoneda(valor: number): string {
-  return new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: 'MXN',
-  }).format(valor)
+// Productos (unificado)
+export function agregarProducto(p: Omit<Producto, 'id'>): Configuracion {
+  const c = cargarConfiguracion()
+  c.productos.items.push({ ...p, id: Date.now().toString() })
+  guardarConfiguracion(c); return c
 }
-
-export function formatearNumero(valor: number): string {
-  return Math.round(valor).toString()
-}
-
-export function calcularM2(largo: number, ancho: number): number {
-  return largo * ancho
-}
-
-export function calcularMerma(areaM2: number, mermaPorcentaje: number): number {
-  return areaM2 * (1 + mermaPorcentaje / 100)
-}
-
-export function calcularPiezasNecesarias(areaTotal: number, largoPieza: number, anchoPieza: number): number {
-  const areaPiezaM2 = (largoPieza * anchoPieza) / 10000
-  if (areaPiezaM2 === 0) return 0
-  return Math.ceil(areaTotal / areaPiezaM2)
-}
-
-export function calcularPrecioTotal(piezas: number, precioPorPieza: number): number {
-  return piezas * precioPorPieza
-}
-
-export function calcularPrecioLaminas(laminas: number, largoLamina: number, anchoLamina: number, precioM2: number): number {
-  const areaLaminaM2 = (largoLamina * anchoLamina) / 10000
-  return laminas * areaLaminaM2 * precioM2
-}
-
-export function agregarProducto(producto: Omit<Producto, 'id'>): Configuracion {
-  const config = cargarConfiguracion()
-  const nuevoProducto: Producto = {
-    ...producto,
-    id: Date.now().toString(),
-  }
-  config.productos.productos.push(nuevoProducto)
-  guardarConfiguracion(config)
-  return config
-}
-
 export function eliminarProducto(id: string): Configuracion {
-  const config = cargarConfiguracion()
-  config.productos.productos = config.productos.productos.filter((p) => p.id !== id)
-  guardarConfiguracion(config)
-  return config
+  const c = cargarConfiguracion()
+  c.productos.items = c.productos.items.filter((p) => p.id !== id)
+  guardarConfiguracion(c); return c
 }
-
 export function actualizarProducto(id: string, datos: Omit<Producto, 'id'>): Configuracion {
-  const config = cargarConfiguracion()
-  const index = config.productos.productos.findIndex((p) => p.id === id)
-  if (index !== -1) {
-    config.productos.productos[index] = { ...datos, id }
-  }
-  guardarConfiguracion(config)
-  return config
+  const c = cargarConfiguracion()
+  const i = c.productos.items.findIndex((p) => p.id === id)
+  if (i !== -1) c.productos.items[i] = { ...datos, id }
+  guardarConfiguracion(c); return c
 }
 
-export function agregarItemInventario(item: Omit<ItemInventario, 'id'>): Configuracion {
-  const config = cargarConfiguracion()
-  const nuevoItem: ItemInventario = {
-    ...item,
-    id: Date.now().toString(),
-  }
-  config.inventario.items.push(nuevoItem)
-  guardarConfiguracion(config)
-  return config
-}
-
-export function eliminarItemInventario(id: string): Configuracion {
-  const config = cargarConfiguracion()
-  config.inventario.items = config.inventario.items.filter((i) => i.id !== id)
-  guardarConfiguracion(config)
-  return config
-}
-
-export function actualizarItemInventario(id: string, datos: Omit<ItemInventario, 'id'>): Configuracion {
-  const config = cargarConfiguracion()
-  const index = config.inventario.items.findIndex((i) => i.id === id)
-  if (index !== -1) {
-    config.inventario.items[index] = { ...datos, id }
-  }
-  guardarConfiguracion(config)
-  return config
-}
-
-export function registrarVenta(id: string, cantidad: number): Configuracion {
-  const config = cargarConfiguracion()
-  const item = config.inventario.items.find((i) => i.id === id)
-  if (item) {
-    item.vendidos = Math.min(item.vendidos + cantidad, item.cantidad)
-  }
-  guardarConfiguracion(config)
-  return config
-}
-
-export function restante(item: ItemInventario): number {
-  return item.cantidad - item.vendidos
-}
-
-export function importarInventario(texto: string): Configuracion {
+export function importarProductos(texto: string): Configuracion {
+  const c = cargarConfiguracion()
   const lineas = texto.trim().split('\n')
-  const config = cargarConfiguracion()
-  const nuevosItems: ItemInventario[] = []
-
   for (const linea of lineas) {
     const partes = linea.split('\t')
-    if (partes.length >= 4) {
-      const nombre = partes[0].trim()
-      const cantidad = parseInt(partes[1]) || 0
-      const vendidos = parseInt(partes[2]) || 0
-      if (nombre) {
-        nuevosItems.push({
-          id: Date.now().toString() + Math.random().toString(36).slice(2, 6),
-          nombre,
-          cantidad,
-          vendidos,
-        })
-      }
+    if (partes.length >= 2) {
+      c.productos.items.push({
+        id: Date.now().toString() + Math.random().toString(36).slice(2, 6),
+        nombre: partes[0].trim(),
+        unidad: 'pieza',
+        precio: 0,
+        cantidad: parseInt(partes[1]) || 0,
+        vendidos: parseInt(partes[2]) || 0,
+      })
     }
   }
-
-  config.inventario.items = [...config.inventario.items, ...nuevosItems]
-  guardarConfiguracion(config)
-  return config
+  guardarConfiguracion(c); return c
 }
+
+// Fórmulas
+export function calcularM2(largo: number, ancho: number): number { return largo * ancho }
+export function calcularMerma(area: number, pct: number): number { return area * (1 + pct / 100) }
+export function calcularPrecioTotal(cant: number, precio: number): number { return cant * precio }
+export function formatearMoneda(v: number): string { return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(v) }
+export function formatearNumero(v: number): string { return Math.round(v).toString() }

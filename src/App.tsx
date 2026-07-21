@@ -1,12 +1,11 @@
 import { useState } from "react"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./components/ui/tabs"
-import { ConfigPisos } from "./components/ConfigPisos"
+import { ConfigPisos } from "./components/pisos/ConfigPisos"
 import { ConfigTechos } from "./components/ConfigTechos"
-import { CalculadoraPiso } from "./components/CalculadoraPiso"
+import { CalculadoraPiso } from "./components/pisos/Layoutpisos"
 import { CalculadoraTecho } from "./components/CalculadoraTecho"
-import { ListaProductos } from "./components/ListaProductos"
-import { Inventario } from "./components/Inventario"
-import { Settings, Calculator, Home, Package, Box } from "lucide-react"
+import { Productos } from "./components/Productos"
+import { Settings, Calculator, Home, Package } from "lucide-react"
 import './App.css'
 
 function App() {
@@ -40,44 +39,17 @@ function App() {
                 <Calculator className="w-4 h-4" />
                 <span className="hidden sm:inline">Calcular </span>Techo
               </TabsTrigger>
-              <TabsTrigger value="inventario" currentValue={tab} onValueChange={setTab} className="gap-1.5 text-xs sm:text-sm">
-                <Box className="w-4 h-4" />
-                Inventario
-              </TabsTrigger>
               <TabsTrigger value="productos" currentValue={tab} onValueChange={setTab} className="gap-1.5 text-xs sm:text-sm">
                 <Package className="w-4 h-4" />
-                Precios
-              </TabsTrigger>
-              <TabsTrigger value="config-piso" currentValue={tab} onValueChange={setTab} className="gap-1.5 text-xs sm:text-sm">
-                <Settings className="w-4 h-4" />
-                <span className="hidden sm:inline">Config </span>Pisos
-              </TabsTrigger>
-              <TabsTrigger value="config-techo" currentValue={tab} onValueChange={setTab} className="gap-1.5 text-xs sm:text-sm">
-                <Settings className="w-4 h-4" />
-                <span className="hidden sm:inline">Config </span>Techos
+                Productos
               </TabsTrigger>
             </TabsList>
           </div>
 
           <div className="mt-6">
-            <TabsContent value="calc-piso" currentValue={tab}>
-              <CalculadoraPiso />
-            </TabsContent>
-            <TabsContent value="calc-techo" currentValue={tab}>
-              <CalculadoraTecho />
-            </TabsContent>
-            <TabsContent value="inventario" currentValue={tab}>
-              <Inventario />
-            </TabsContent>
-            <TabsContent value="productos" currentValue={tab}>
-              <ListaProductos />
-            </TabsContent>
-            <TabsContent value="config-piso" currentValue={tab}>
-              <ConfigPisos />
-            </TabsContent>
-            <TabsContent value="config-techo" currentValue={tab}>
-              <ConfigTechos />
-            </TabsContent>
+            <TabsContent value="calc-piso" currentValue={tab}><CalculadoraPiso /></TabsContent>
+            <TabsContent value="calc-techo" currentValue={tab}><CalculadoraTecho /></TabsContent>
+            <TabsContent value="productos" currentValue={tab}><Productos /></TabsContent>
           </div>
         </Tabs>
       </main>

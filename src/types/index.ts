@@ -20,47 +20,21 @@ export interface Producto {
   nombre: string
   unidad: string
   precio: number
-  descripcion?: string
-}
-
-export interface ItemInventario {
-  id: string
-  nombre: string
   cantidad: number
   vendidos: number
 }
 
-export interface ConfigPisos {
-  tallas: TallaPiso[]
-}
-
-export interface ConfigTechos {
-  tipos: TipoTecho[]
-}
-
-export interface ConfigProductos {
-  productos: Producto[]
-}
-
-export interface ConfigInventario {
-  items: ItemInventario[]
-}
+interface ConfigPisos { tallas: TallaPiso[] }
+interface ConfigTechos { tipos: TipoTecho[] }
+interface ConfigProductos { items: Producto[] }
 
 export interface Configuracion {
   pisos: ConfigPisos
   techos: ConfigTechos
   productos: ConfigProductos
-  inventario: ConfigInventario
-}
-
-export interface Dimensiones {
-  largo: number
-  ancho: number
 }
 
 export interface ResultadoCalculo {
   areaM2: number
-  piezasNecesarias?: number
-  areaTotalCubierta?: number
   precioTotal?: number
 }
