@@ -38,3 +38,18 @@ export interface ResultadoCalculo {
   areaM2: number
   precioTotal?: number
 }
+
+export interface MaterialesTechoPorArea {
+  laminasPVC: number
+  omegas: number
+  viguetas: number
+  tornillosEstructura: number
+  tornillosPVC: number
+  chazosTecho: number
+}
+export interface MaterialesTecho {
+  perimetralPlastico?: number
+  angulos?: number
+  chazosPared?: number
+ 
+}

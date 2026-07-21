@@ -1,4 +1,4 @@
-import type { Configuracion, TallaPiso, TipoTecho, Producto } from '../types'
+import type { Configuracion, TallaPiso, TipoTecho, Producto, MaterialesTechoPorArea,MaterialesTecho } from '../types'
 
 const STORAGE_KEY = 'techos-pisos-config'
 
@@ -72,7 +72,25 @@ export function actualizarTipoTecho(id: string, datos: Omit<TipoTecho, 'id'>): C
   if (i !== -1) c.techos.tipos[i] = { ...datos, id }
   guardarConfiguracion(c); return c
 }
-
+export const calcularMaterialesPorArea = (m2: number, areaPorLaminaPVC: number): MaterialesTechoPorArea => {
+  return {
+    laminasPVC: Math.ceil(m2 / areaPorLaminaPVC),
+    omegas: Math.ceil((m2 * 2.6) / 3),
+    viguetas: Math.ceil((m2 * 1.1) / 3),
+    tornillosEstructura: Math.ceil(m2 * 15),
+    tornillosPVC: Math.ceil(m2 * 15),
+    chazosTecho: Math.ceil(m2 * 1.25),
+  }
+}
+export function calcularMaterialesTecho(
+  perimetro: number
+): MaterialesTecho {
+  return {
+    perimetralPlastico: Math.ceil(perimetro / 6),
+    angulos: Math.ceil(perimetro / 3),
+    chazosPared: Math.ceil(perimetro / 0.4),
+  }
+}
 // Productos (unificado)
 export function agregarProducto(p: Omit<Producto, 'id'>): Configuracion {
   const c = cargarConfiguracion()
@@ -116,3 +134,7 @@ export function calcularMerma(area: number, pct: number): number { return area *
 export function calcularPrecioTotal(cant: number, precio: number): number { return cant * precio }
 export function formatearMoneda(v: number): string { return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(v) }
 export function formatearNumero(v: number): string { return Math.round(v).toString() }
+export function redondearArribaDecimal(numero: number, decimales: number): number {
+  let factor = Math.pow(10, decimales);
+  return Math.ceil(numero * factor) / factor;
+}
