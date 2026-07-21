@@ -98,17 +98,22 @@ export function CalculadoraPiso() {
             </div>
 
             {resultado && talla && (
-              <div className="rounded-lg border border-[var(--color-border)] p-4 space-y-2 bg-[var(--color-muted)]">
-                <div className="flex justify-between text-sm">
+              <div className="rounded-lg border border-[var(--color-border)] p-3 space-y-1 bg-[var(--color-muted)] text-sm">
+                <div className="font-medium text-[var(--color-foreground)] border-b border-[var(--color-border)] pb-1 mb-1">Resumen</div>
+                <div className="flex justify-between">
                   <span className="text-[var(--color-muted-foreground)]">Área:</span>
                   <span className="font-medium">{formatearNumero(resultado.areaM2)} m²</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-[var(--color-muted-foreground)]">Precio por pieza:</span>
-                  <span className="font-medium">{formatearMoneda(talla.precioPorPieza)}</span>
+                <div className="flex justify-between">
+                  <span className="text-[var(--color-muted-foreground)]">Modelo:</span>
+                  <span className="font-medium">{talla.largo}×{talla.ancho} cm</span>
                 </div>
-                <div className="border-t border-[var(--color-border)] pt-2 mt-2">
-                  <div className="flex justify-between">
+                <div className="flex justify-between">
+                  <span className="text-[var(--color-muted-foreground)]">Precio:</span>
+                  <span className="font-medium">{formatearMoneda(talla.precioPorPieza)}/pza</span>
+                </div>
+                <div className="border-t border-[var(--color-border)] pt-1 mt-1">
+                  <div className="flex justify-between items-center">
                     <span className="font-semibold">Total:</span>
                     <span className="font-bold text-lg text-[var(--color-primary)]">{formatearMoneda(resultado.precioTotal ?? 0)}</span>
                   </div>
