@@ -1,11 +1,9 @@
 import { useState } from "react"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./components/ui/tabs"
-import { ConfigPisos } from "./components/pisos/ConfigPisos"
-import { ConfigTechos } from "./components/ConfigTechos"
 import { CalculadoraPiso } from "./components/pisos/Layoutpisos"
 import { CalculadoraTecho } from "./components/CalculadoraTecho"
 import { Productos } from "./components/Productos"
-import { Settings, Calculator, Home, Package } from "lucide-react"
+import { Calculator, Home, Package } from "lucide-react"
 import './App.css'
 
 function App() {

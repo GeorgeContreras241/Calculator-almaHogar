@@ -1,34 +1,53 @@
-# React + TypeScript + Vite
+# Techos, Pisos & PVC
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Calculadora de materiales para instalación de techos, pisos y PVC. Permite calcular láminas, omegas, viguetas, tornillos, perimetral y costos por proyecto.
 
-Currently, two official plugins are available:
+## Características
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Calculadora de Piso** — por medida (largo × ancho) o directo en m², con precio por pieza
+- **Calculadora de Techo** — por lámina o por m², con materiales (láminas PVC, ómegas, viguetas, tornillos, chazos) y perimetral
+- **Catálogo de Productos** — lista de productos con precios, búsqueda, importación y edición
+- **Configuración inline** — agregar/editar/eliminar tallas de piso y tipos de techo directo desde cada calculadora
+- **Persistencia** — toda la configuración se guarda automáticamente en `localStorage`
+- **Dark mode** — tema oscuro nativo, optimizado para uso en móvil
 
-## React Compiler
+## Stack
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+- Vite 8 + React 19 + TypeScript
+- Tailwind CSS v4
+- Lucide React (iconos)
 
-Note: This will impact Vite dev & build performances.
+## Instalación
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+pnpm install
+pnpm dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Build
+
+```bash
+pnpm build
+```
+
+## Estructura
+
+```
+src/
+├── components/
+│   ├── pisos/
+│   │   ├── CalculadoraPiso.tsx    # Calculadora de piso con config inline
+│   │   ├── ConfigPisos.tsx        # Configuración de tallas y precios
+│   │   └── Layoutpisos.tsx
+│   ├── CalculadoraTecho.tsx       # Calculadora de techo con config inline
+│   ├── ConfigTechos.tsx           # Configuración de tipos y precios
+│   ├── Productos.tsx              # Catálogo de productos
+│   └── ui/                        # Componentes base (Button, Card, Input, etc.)
+├── lib/
+│   ├── formulas.ts                # Funciones de cálculo y persistencia
+│   └── utils.ts                   # Utilidades
+├── types/
+│   └── index.ts                   # Definiciones de tipos
+├── App.tsx                        # Layout principal con tabs
+└── main.tsx
+```
