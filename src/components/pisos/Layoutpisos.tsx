@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react"
-import { Button } from "../ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
-import { Input } from "../ui/input"
-import { Label } from "../ui/label"
-import { cargarConfiguracion, calcularM2, calcularPrecioTotal, formatearMoneda, formatearNumero } from "../../lib/formulas"
-import type { Configuracion, ResultadoCalculo } from "../../types"
-import { Calculator } from "lucide-react"
-import { ConfigPisos } from "./ConfigPisos"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { cargarConfiguracion, calcularM2, calcularPrecioTotal, formatearMoneda, formatearNumero } from "@/lib/formulas"
+import type { Configuracion, ResultadoCalculo } from "@/types"
+import { Calculator, Settings } from "lucide-react"
+import { ConfigPisos } from "@/components/pisos/ConfigPisos"
 
 export function CalculadoraPiso() {
   const [config, setConfig] = useState<Configuracion>(cargarConfiguracion)
@@ -50,8 +50,8 @@ export function CalculadoraPiso() {
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
           <Calculator className="w-5 h-5" /> Calculadora de Piso
-          <button className="ml-auto text-sm text-[var(--color-primary)]" onClick={() => setConfigOpen(!configOpen)}>
-            {configOpen ? "Cerrar Configuración" : "Abrir Configuración"}
+          <button className="ml-auto text-muted-foreground hover:text-foreground cursor-pointer" onClick={() => setConfigOpen(!configOpen)}>
+            <Settings className="w-5 h-5" />
           </button>
         </CardTitle>
       </CardHeader>
@@ -62,7 +62,7 @@ export function CalculadoraPiso() {
             <div className="space-y-2">
               <Label>Talla del piso</Label>
               <select value={tallaId} onChange={(e) => setTallaId(e.target.value)}
-                className="flex h-9 w-full rounded-md border border-[var(--color-input)] bg-[var(--color-background)] text-[var(--color-foreground)] px-3 py-1 text-base shadow-sm md:text-sm">
+                className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-base shadow-sm md:text-sm">
                 {opciones.length === 0
                   ? <option value="">No hay tallas configuradas</option>
                   : opciones.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -98,24 +98,24 @@ export function CalculadoraPiso() {
             </div>
 
             {resultado && talla && (
-              <div className="rounded-lg border border-[var(--color-border)] p-3 space-y-1 bg-[var(--color-muted)] text-sm">
-                <div className="font-medium text-[var(--color-foreground)] border-b border-[var(--color-border)] pb-1 mb-1">Resumen</div>
+              <div className="rounded-lg border border-border p-3 space-y-1 bg-muted text-sm">
+                <div className="font-medium text-foreground border-b border-border pb-1 mb-1">Resumen</div>
                 <div className="flex justify-between">
-                  <span className="text-[var(--color-muted-foreground)]">Área:</span>
+                  <span className="text-muted-foreground">Área:</span>
                   <span className="font-medium">{formatearNumero(resultado.areaM2)} m²</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[var(--color-muted-foreground)]">Modelo:</span>
+                  <span className="text-muted-foreground">Modelo:</span>
                   <span className="font-medium">{talla.largo}×{talla.ancho} cm</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[var(--color-muted-foreground)]">Precio:</span>
+                  <span className="text-muted-foreground">Precio:</span>
                   <span className="font-medium">{formatearMoneda(talla.precioPorPieza)}/pza</span>
                 </div>
-                <div className="border-t border-[var(--color-border)] pt-1 mt-1">
+                <div className="border-t border-border pt-1 mt-1">
                   <div className="flex justify-between items-center">
                     <span className="font-semibold">Total:</span>
-                    <span className="font-bold text-lg text-[var(--color-primary)]">{formatearMoneda(resultado.precioTotal ?? 0)}</span>
+                    <span className="font-bold text-lg text-primary">{formatearMoneda(resultado.precioTotal ?? 0)}</span>
                   </div>
                 </div>
               </div>

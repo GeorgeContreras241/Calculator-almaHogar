@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "../../lib/utils"
+import { cn } from "@/lib/utils"
 
 const Tabs = React.forwardRef<
   HTMLDivElement,
@@ -23,7 +23,7 @@ const TabsList = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "inline-flex h-10 items-center justify-center rounded-md bg-[var(--color-muted)] p-1 text-[var(--color-muted-foreground)]",
+      "inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
       className
     )}
     {...props}
@@ -38,8 +38,8 @@ const TabsTrigger = React.forwardRef<
   <button
     ref={ref}
     className={cn(
-      "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-ring)] disabled:pointer-events-none disabled:opacity-50 cursor-pointer",
-      currentValue === value && "bg-[var(--color-background)] text-[var(--color-foreground)] shadow-sm",
+      "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 cursor-pointer",
+      currentValue === value && "bg-background text-foreground shadow-sm",
       className
     )}
     onClick={() => onValueChange?.(value)}
@@ -58,7 +58,7 @@ const TabsContent = React.forwardRef<
   return (
     <div
       ref={ref}
-      className={cn("mt-2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-ring)]", className)}
+      className={cn("mt-2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring", className)}
       {...props}
     >
       {children}

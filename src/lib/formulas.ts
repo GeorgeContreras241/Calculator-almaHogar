@@ -1,4 +1,4 @@
-import type { Configuracion, TallaPiso, TipoTecho, Producto, MaterialesTechoPorArea,MaterialesTecho } from '../types'
+import type { Configuracion, TallaPiso, TipoTecho, Producto, MaterialesTechoPorArea,MaterialesTecho } from '@/types'
 
 const STORAGE_KEY = 'techos-pisos-config'
 

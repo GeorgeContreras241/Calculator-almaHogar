@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react"
-import { Button } from "../ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
-import { Input } from "../ui/input"
-import { Label } from "../ui/label"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
   cargarConfiguracion,
   agregarTallaPiso,
   eliminarTallaPiso,
   actualizarTallaPiso,
   formatearMoneda,
-} from "../../lib/formulas"
-import type { Configuracion, TallaPiso } from "../../types"
+} from "@/lib/formulas"
+import type { Configuracion, TallaPiso } from "@/types"
 import { Plus, Trash2, Edit2, Check, X } from "lucide-react"
 
 export function ConfigPisos() {
@@ -142,7 +142,7 @@ export function ConfigPisos() {
 
         <div className="border border-gray-800 rounded-lg divide-y divide-gray-700">
           {config.pisos.tallas.length === 0 ? (
-            <p className="p-4 text-sm text-[var(--color-muted-foreground)] text-center">
+            <p className="p-4 text-sm text-muted-foreground text-center">
               No hay tallas configuradas
             </p>
           ) : (

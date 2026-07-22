@@ -6,8 +6,8 @@ import { Label } from "./ui/label"
 import {
   cargarConfiguracion, agregarProducto, eliminarProducto, actualizarProducto,
   importarProductos, formatearMoneda,
-} from "../lib/formulas"
-import type { Configuracion } from "../types"
+} from "@/lib/formulas"
+import type { Configuracion } from "@/types"
 import { Plus, Trash2, Edit2, Check, X, Package, Search, Upload } from "lucide-react"
 
 export function Productos() {
@@ -52,12 +52,12 @@ export function Productos() {
     setTextoImport(""); setMostrarImport(false)
   }
 
-  const selectCls = "flex h-8 w-full rounded-md border border-[var(--color-input)] bg-[var(--color-background)] text-[var(--color-foreground)] px-2 text-sm"
+  const selectCls = "flex h-8 w-full rounded-md border border-input bg-background text-foreground px-2 text-sm"
   const unidadOpts = ["pieza","kg","lt","ml","m²","caja","paquete","rollo","tubo","bulto"]
 
   return (
     <div className="space-y-3">
-      <Card className="border-[var(--color-border)]">
+      <Card className="border-border">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <CardTitle className="text-lg flex items-center gap-2">
@@ -75,14 +75,14 @@ export function Productos() {
         </CardHeader>
         <CardContent className="space-y-3 pt-0">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-muted-foreground)]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input placeholder="Buscar producto..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} className="pl-9 h-9" />
           </div>
 
           {mostrarImport && (
-            <div className="border border-[var(--color-border)] rounded-lg p-3 space-y-2 bg-[var(--color-card)]">
+            <div className="border border-border rounded-lg p-3 space-y-2 bg-card">
               <Label className="text-xs">Formato: nombre TAB unidad TAB precio</Label>
-              <textarea className="flex w-full rounded-md border border-[var(--color-input)] bg-[var(--color-background)] px-3 py-2 text-sm min-h-[80px] font-mono" value={textoImport} onChange={(e) => setTextoImport(e.target.value)} placeholder={"silicona\tpieza\t85\ntornillo\tkg\t120"} />
+              <textarea className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm min-h-[80px] font-mono" value={textoImport} onChange={(e) => setTextoImport(e.target.value)} placeholder={"silicona\tpieza\t85\ntornillo\tkg\t120"} />
               <div className="flex gap-2">
                 <Button onClick={importar} size="sm">Importar</Button>
                 <Button onClick={() => setMostrarImport(false)} size="sm" variant="outline">Cancelar</Button>
@@ -91,7 +91,7 @@ export function Productos() {
           )}
 
           {mostrarForm && (
-            <div className="border border-[var(--color-border)] rounded-lg p-3 space-y-2 bg-[var(--color-card)]">
+            <div className="border border-border rounded-lg p-3 space-y-2 bg-card">
               <div className="grid grid-cols-3 gap-2">
                 <div className="space-y-1">
                   <Label className="text-xs">Nombre *</Label>
@@ -117,26 +117,26 @@ export function Productos() {
         </CardContent>
       </Card>
 
-      <Card className="border-[var(--color-border)]">
+      <Card className="border-border">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[var(--color-border)] bg-[var(--color-muted)]/50">
-                  <th className="text-left py-2 px-3 font-medium text-[var(--color-muted-foreground)] text-xs">Producto</th>
-                  <th className="text-center py-2 px-2 font-medium text-[var(--color-muted-foreground)] text-xs">Unidad</th>
-                  <th className="text-center py-2 px-2 font-medium text-[var(--color-muted-foreground)] text-xs">Precio</th>
-                  <th className="text-center py-2 px-2 font-medium text-[var(--color-muted-foreground)] text-xs w-20"></th>
+                <tr className="border-b border-border bg-muted/50">
+                  <th className="text-left py-2 px-3 font-medium text-muted-foreground text-xs">Producto</th>
+                  <th className="text-center py-2 px-2 font-medium text-muted-foreground text-xs">Unidad</th>
+                  <th className="text-center py-2 px-2 font-medium text-muted-foreground text-xs">Precio</th>
+                  <th className="text-center py-2 px-2 font-medium text-muted-foreground text-xs w-20"></th>
                 </tr>
               </thead>
               <tbody>
                 {items.map((p) => (
-                  <tr key={p.id} className="border-b border-[var(--color-border)] last:border-b-0 hover:bg-[var(--color-muted)]/30 transition-colors">
+                  <tr key={p.id} className="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
                     {editId === p.id ? (
                       <>
                         <td className="py-1.5 px-3"><Input value={editForm.nombre} onChange={(e) => setEditForm({ ...editForm, nombre: e.target.value })} className="h-7 text-xs" /></td>
                         <td className="py-1.5 px-2">
-                          <select value={editForm.unidad} onChange={(e) => setEditForm({ ...editForm, unidad: e.target.value })} className="h-7 text-xs rounded border border-[var(--color-input)] bg-[var(--color-background)] text-[var(--color-foreground)] px-1">
+                          <select value={editForm.unidad} onChange={(e) => setEditForm({ ...editForm, unidad: e.target.value })} className="h-7 text-xs rounded border border-input bg-background text-foreground px-1">
                             {unidadOpts.map((u) => <option key={u} value={u}>{u}</option>)}
                           </select>
                         </td>
@@ -151,8 +151,8 @@ export function Productos() {
                     ) : (
                       <>
                         <td className="py-2 px-3 font-medium text-sm">{p.nombre}</td>
-                        <td className="py-2 px-2 text-center text-xs text-[var(--color-muted-foreground)]">{p.unidad}</td>
-                        <td className="py-2 px-2 text-center font-mono text-sm font-bold text-[var(--color-primary)]">{formatearMoneda(p.precio)}</td>
+                        <td className="py-2 px-2 text-center text-xs text-muted-foreground">{p.unidad}</td>
+                        <td className="py-2 px-2 text-center font-mono text-sm font-bold text-primary">{formatearMoneda(p.precio)}</td>
                         <td className="py-2 px-2">
                           <div className="flex gap-0.5 justify-center">
                             <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => { setEditId(p.id); setEditForm({ nombre: p.nombre, unidad: p.unidad, precio: p.precio.toString() }) }}>
@@ -172,8 +172,8 @@ export function Productos() {
           </div>
           {items.length === 0 && (
             <div className="py-6 text-center">
-              <Package className="w-10 h-10 mx-auto text-[var(--color-muted-foreground)] mb-2 opacity-50" />
-              <p className="text-sm text-[var(--color-muted-foreground)]">{busqueda ? "No se encontraron productos" : "No hay productos"}</p>
+              <Package className="w-10 h-10 mx-auto text-muted-foreground mb-2 opacity-50" />
+              <p className="text-sm text-muted-foreground">{busqueda ? "No se encontraron productos" : "No hay productos"}</p>
             </div>
           )}
         </CardContent>
