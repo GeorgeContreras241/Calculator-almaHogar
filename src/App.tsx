@@ -1,29 +1,17 @@
 import { useState } from "react"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "./components/ui/tabs"
-import { CalculadoraPiso } from "./components/pisos/Layoutpisos"
-import { CalculadoraTecho } from "./components/CalculadoraTecho"
-import { Productos } from "./components/Productos"
-import { Calculator, Home, Package } from "lucide-react"
-import './App.css'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { CalculadoraPiso } from "@/components/pisos/Layoutpisos"
+import { CalculadoraTecho } from "@/components/techos/Layouttechos"
+import { Productos } from "@/components/Productos"
+import { Calculator, Package } from "lucide-react"
+import { Header } from "@/components/ui/header"
 
 function App() {
   const [tab, setTab] = useState("calc-piso")
 
   return (
-    <div className="min-h-screen bg-[var(--color-background)]">
-      <header className="border-b border-[var(--color-border)] bg-[var(--color-card)]">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[var(--color-primary)] text-[var(--color-primary-foreground)]">
-              <Home className="w-5 h-5" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-[var(--color-foreground)]">Techos, Pisos & PVC</h1>
-              <p className="text-sm text-[var(--color-muted-foreground)]">Calculadora de materiales</p>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background text-foreground">
+      <Header />
 
       <main className="max-w-4xl mx-auto px-4 py-8">
         <Tabs value={tab} onValueChange={setTab}>
