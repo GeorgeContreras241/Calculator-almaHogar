@@ -51,5 +51,14 @@ export interface MaterialesTecho {
   perimetralPlastico?: number
   angulos?: number
   chazosPared?: number
- 
+}
+
+export interface Result {
+  precioUnitario: number
+  total: number
+  areaM2: number
+  perimetroM: number
+  modelo: string
+  materiales?: MaterialesTechoPorArea
+  perimetral?: MaterialesTecho
 }
