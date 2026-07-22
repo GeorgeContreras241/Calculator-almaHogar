@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react"
-import { Button } from "./ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
-import { Input } from "./ui/input"
-import { Label } from "./ui/label"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
   cargarConfiguracion,
   agregarTipoTecho,
   eliminarTipoTecho,
   actualizarTipoTecho,
   formatearMoneda,
-} from "../lib/formulas"
-import type { Configuracion, TipoTecho } from "../types"
+} from "@/lib/formulas"
+import type { Configuracion, TipoTecho } from "@/types"
 import { Plus, Trash2, Edit2, Check, X } from "lucide-react"
 
 export function ConfigTechos() {
@@ -121,9 +121,9 @@ export function ConfigTechos() {
           </div>
         </div>
 
-        <div className="border border-[var(--color-border)] rounded-lg divide-y divide-[var(--color-border)]">
+        <div className="border border-border rounded-lg divide-y divide-border">
           {config.techos.tipos.length === 0 ? (
-            <p className="p-4 text-sm text-[var(--color-muted-foreground)] text-center">
+            <p className="p-4 text-sm text-muted-foreground text-center">
               No hay tipos de techo configurados
             </p>
           ) : (
@@ -148,11 +148,11 @@ export function ConfigTechos() {
                 ) : (
                   <>
                     <span className="font-medium flex-1 min-w-[80px]">{tipo.nombre}</span>
-                    <span className="text-[var(--color-muted-foreground)] text-xs">{tipo.largo}×{tipo.ancho}</span>
-                    <span className="font-mono text-xs border border-[var(--color-border)] rounded px-2 py-0.5">
+                    <span className="text-muted-foreground text-xs">{tipo.largo}×{tipo.ancho}</span>
+                    <span className="font-mono text-xs border border-border rounded px-2 py-0.5">
                       {formatearMoneda(tipo.precioLamina)}/lámina
                     </span>
-                    <span className="font-mono text-xs border border-[var(--color-border)] rounded px-2 py-0.5">
+                    <span className="font-mono text-xs border border-border rounded px-2 py-0.5">
                       {formatearMoneda(tipo.precioM2)}/m²
                     </span>
                     <div className="flex gap-1">
