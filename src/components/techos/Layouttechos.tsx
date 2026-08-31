@@ -161,7 +161,7 @@ export function CalculadoraTecho() {
               {resultado.perimetral && (
                 <>
                   <div className="font-medium text-foreground border-t border-border pt-1 mt-1">Perimetral</div>
-                  <CardResult title="Perimetral plástico">{resultado.perimetral.perimetralPlastico.toFixed(2)} piezas</CardResult>
+                  <CardResult title="Perimetral plástico">{resultado.perimetral.perimetralPlastico?.toFixed(2)} piezas</CardResult>
                   <CardResult title="Ángulos">{resultado.perimetral.angulos?.toFixed(2)} piezas</CardResult>
                   <CardResult title="Chazos pared">{resultado.perimetral.chazosPared?.toFixed(2)} piezas</CardResult>
                 </>
