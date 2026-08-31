@@ -31,11 +31,13 @@ export function CalculadoraPiso() {
       const l = parseFloat(area.largo), a = parseFloat(area.ancho)
       if (isNaN(l) || isNaN(a) || l <= 0 || a <= 0) return
       const m2 = calcularM2(l, a)
-      setResultado({ areaM2: m2, precioTotal: calcularPrecioTotal(m2, talla.precioPorPieza) })
+      const periemtroEstimado: number = (Math.sqrt(m2) * 4) / 2.44
+      setResultado({ areaM2: m2, precioTotal: calcularPrecioTotal(m2, talla.precioPorPieza), perimetroM: periemtroEstimado })
     } else {
-      const m = parseFloat(areaM)
-      if (isNaN(m) || m <= 0) return
-      setResultado({ areaM2: m, precioTotal: calcularPrecioTotal(m, talla.precioPorPieza) })
+      const m2 = parseFloat(areaM)
+      const periemtroEstimado: number = (Math.sqrt(m2) * 4) / 2.44
+      if (isNaN(m2) || m2 <= 0) return
+      setResultado({ areaM2: m2, precioTotal: calcularPrecioTotal(m2, talla.precioPorPieza), perimetroM: periemtroEstimado })
     }
   }
 
@@ -112,6 +114,11 @@ export function CalculadoraPiso() {
                   <span className="text-muted-foreground">Precio:</span>
                   <span className="font-medium">{formatearMoneda(talla.precioPorPieza)}/pza</span>
                 </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Gaurda Escobas estimado:</span>
+                  <span className="font-medium">{resultado.perimetroM?.toFixed(2)} piezas</span>
+                </div>
+
                 <div className="border-t border-border pt-1 mt-1">
                   <div className="flex justify-between items-center">
                     <span className="font-semibold">Total:</span>

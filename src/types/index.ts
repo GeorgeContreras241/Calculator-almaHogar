@@ -37,6 +37,7 @@ export interface Configuracion {
 export interface ResultadoCalculo {
   areaM2: number
   precioTotal?: number
+  perimetroM?: number
 }
 
 export interface MaterialesTechoPorArea {
