@@ -41,6 +41,7 @@ export interface ResultadoCalculo {
 
 export interface MaterialesTechoPorArea {
   laminasPVC: number
+  valorMaterialBruto : number
   omegas: number
   viguetas: number
   tornillosEstructura: number
@@ -61,4 +62,5 @@ export interface Result {
   modelo: string
   materiales?: MaterialesTechoPorArea
   perimetral?: MaterialesTecho
+  valorMaterialBruto?: MaterialesTechoPorArea
 }

@@ -73,22 +73,25 @@ export function actualizarTipoTecho(id: string, datos: Omit<TipoTecho, 'id'>): C
   guardarConfiguracion(c); return c
 }
 export const calcularMaterialesPorArea = (m2: number, areaPorLaminaPVC: number): MaterialesTechoPorArea => {
+  console.log(15/2)
   return {
     laminasPVC: Math.ceil(m2 / areaPorLaminaPVC),
-    omegas: Math.ceil((m2 * 2.6) / 3),
-    viguetas: Math.ceil((m2 * 1.1) / 3),
-    tornillosEstructura: Math.ceil(m2 * 15),
-    tornillosPVC: Math.ceil(m2 * 15),
+    valorMaterialBruto : m2 / areaPorLaminaPVC,
+    omegas: m2  / 2,
+    viguetas: (m2 / 2) / 2,
+    tornillosEstructura: m2 * 10,
+    tornillosPVC: Math.ceil(m2 * 10),
     chazosTecho: Math.ceil(m2 * 1.25),
   }
 }
 export function calcularMaterialesTecho(
-  perimetro: number
+  area: number
 ): MaterialesTecho {
+  const perimetro = Math.sqrt(area) * 4
   return {
-    perimetralPlastico: Math.ceil(perimetro / 6),
-    angulos: Math.ceil(perimetro / 3),
-    chazosPared: Math.ceil(perimetro / 0.4),
+    perimetralPlastico: perimetro / 5.95,
+    angulos: perimetro / 2.44,
+    chazosPared: perimetro / 0.4,
   }
 }
 // Productos (unificado)
