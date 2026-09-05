@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { cargarConfiguracion, formatearMoneda, formatearNumero, calcularMaterialesPorArea, calcularMaterialesTecho} from "@/lib/formulas"
+import { cargarConfiguracion, formatearMoneda, formatearNumero, calcularMaterialesPorArea, calcularMaterialesTecho } from "@/lib/formulas"
 import type { Configuracion, Result } from "@/types"
 import { Calculator, Settings } from "lucide-react"
 import { CardResult } from "@/components/ui/cardResult"
@@ -13,10 +13,9 @@ export function CalculadoraTecho() {
   const [config, setConfig] = useState<Configuracion>(cargarConfiguracion)
   const [configOpen, setConfigOpen] = useState(false)
   const [tipoId, setTipoId] = useState("")
-  const [modo, setModo] = useState<"laminas" | "metro">("laminas")
+  const [modo, setModo] = useState<"laminas" | "metro">("metro")
   const [cantLaminas, setCantLaminas] = useState("")
   const [m2, setM2] = useState("")
-  const [perimetro, setPerimetro] = useState("")
   const [resultado, setResultado] = useState<Result | null>(null)
 
   useEffect(() => { setConfig(cargarConfiguracion()) }, [])
@@ -26,7 +25,6 @@ export function CalculadoraTecho() {
   }, [config.techos.tipos, tipoId])
 
   const tipo = config.techos.tipos.find((t) => t.id === tipoId)
-
   const calcular = () => {
     if (!tipo) return
     if (modo === "laminas") {
@@ -44,7 +42,7 @@ export function CalculadoraTecho() {
       if (isNaN(m) || m <= 0) return
       const perimetroCalculado = Math.sqrt(m) * 4
 
-      const materiales = calcularMaterialesPorArea(m, 1.8)
+      const materiales = calcularMaterialesPorArea(m, tipo.m2)
       const perimetral = calcularMaterialesTecho(m)
       setResultado({
         precioUnitario: tipo.precioM2,
@@ -59,13 +57,10 @@ export function CalculadoraTecho() {
   }
 
   const limpiar = () => {
-    setCantLaminas(""); setM2(""); setPerimetro(""); setResultado(null)
+    setCantLaminas(""); 
+    setM2(""); 
+    setResultado(null)
   }
-
-  const opciones = config.techos.tipos.map((t) => ({
-    value: t.id, label: `${t.nombre} - ${formatearMoneda(t.precioLamina)}/lámina | ${formatearMoneda(t.precioM2)}/m²`
-  }))
-  console.log(resultado)
 
   return (
     <Card>
@@ -81,19 +76,23 @@ export function CalculadoraTecho() {
       {/* content */}
       {!configOpen ? (
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label>Tipo de techo</Label>
-            <select value={tipoId} onChange={(e) => setTipoId(e.target.value)}
-              className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-base shadow-sm md:text-sm">
-              {opciones.length === 0
-                ? <option value="">No hay tipos configurados</option>
-                : opciones.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
+          <div className={`grid text-sm font-medium border border-gray-800 rounded-md overflow-hidden ${config.techos.tipos.length === 2 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+            {config.techos.tipos.map((t) => (
+              <button
+                key={t.id}
+                className={`px-4 py-2 ${tipoId === t.id ? "bg-neutral-100 text-neutral-900" : ""} cursor-pointer rounded-r-md h-9`}
+                onClick={() => setTipoId(t.id)}
+              >
+                {t.nombre} - {formatearMoneda(t.precioLamina)} - {formatearMoneda(t.precioM2)}
+              </button>
+            ))}
           </div>
 
           <div className="grid grid-cols-2 text-sm font-medium border border-gray-800 rounded-md overflow-hidden">
-            <button className={`px-4 py-2 ${modo === "laminas" ? "bg-neutral-100 text-neutral-900" : ""} rounded-l-md cursor-pointer h-9`} onClick={() => { limpiar(); setModo("laminas") }}>Por lámina</button>
-            <button className={`px-4 py-2 ${modo === "metro" ? "bg-neutral-100 text-neutral-900" : ""} rounded-r-md cursor-pointer h-9`} onClick={() => { limpiar(); setModo("metro") }}>Por m²</button>
+            <button className={`px-4 py-2 ${modo === "metro" ? "bg-neutral-100 text-neutral-900" : ""} rounded-r-md cursor-pointer h-9`}
+              onClick={() => { limpiar(); setModo("metro") }}>Por m²</button>
+            <button className={`px-4 py-2 ${modo === "laminas" ? "bg-neutral-100 text-neutral-900" : ""} rounded-l-md cursor-pointer h-9`}
+              onClick={() => { limpiar(); setModo("laminas") }}>Por lámina</button>
           </div>
 
           {modo === "laminas" ? (
@@ -102,14 +101,10 @@ export function CalculadoraTecho() {
               <Input type="number" placeholder="0" value={cantLaminas} onChange={(e) => setCantLaminas(e.target.value)} min="0" step="1" />
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4">
               <div className="space-y-2">
                 <Label>Área (m²)</Label>
                 <Input type="number" placeholder="0" value={m2} onChange={(e) => setM2(e.target.value)} min="0" step="0.01" />
-              </div>
-              <div className="space-y-2">
-                <Label>Perímetro (m) <span className="text-xs text-muted-foreground">opcional</span></Label>
-                <Input type="number" placeholder="0" value={perimetro} onChange={(e) => setPerimetro(e.target.value)} min="0" step="0.1" />
               </div>
             </div>
           )}
@@ -134,7 +129,7 @@ export function CalculadoraTecho() {
                 <CardResult title="Láminas">{cantLaminas} piezas</CardResult>
               ) : (
                 <>
-                  <CardResult title="Área">{formatearNumero(resultado.areaM2)} m²</CardResult>
+                  <CardResult title="Área">{resultado.areaM2} m²</CardResult>
                   {resultado.perimetroM > 0 && (
                     <CardResult title="Perímetro">{formatearNumero(resultado.perimetroM)} m</CardResult>
                   )}
