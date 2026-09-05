@@ -13,6 +13,7 @@ export interface TipoTecho {
   ancho: number
   precioLamina: number
   precioM2: number
+  m2: number
 }
 
 export interface Producto {
@@ -32,6 +33,7 @@ export interface Configuracion {
   pisos: ConfigPisos
   techos: ConfigTechos
   productos: ConfigProductos
+
 }
 
 export interface ResultadoCalculo {

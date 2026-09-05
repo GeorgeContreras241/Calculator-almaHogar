@@ -7,13 +7,12 @@ const DEFAULT_CONFIG: Configuracion = {
     tallas: [
       { id: '1', nombre: '60x60 cm', largo: 60, ancho: 60, precioPorPieza: 85 },
       { id: '2', nombre: '80x80 cm', largo: 80, ancho: 80, precioPorPieza: 120 },
-      { id: '3', nombre: '100x100 cm', largo: 100, ancho: 100, precioPorPieza: 180 },
     ],
   },
   techos: {
     tipos: [
-      { id: '1', nombre: 'Estándar', largo: 244, ancho: 122, precioLamina: 27, precioM2: 15 },
-      { id: '2', nombre: 'PVC', largo: 244, ancho: 122, precioLamina: 45, precioM2: 28 },
+      { id: '1', nombre: 'Techo 30cm', largo: 595, ancho: 30, precioLamina: 27000, precioM2: 23000, m2: 1.8 },
+      { id: '2', nombre: 'Techo 25cm', largo: 595, ancho: 25, precioLamina: 27000, precioM2: 21000, m2: 1.5 },
     ],
   },
   productos: { items: [] },
