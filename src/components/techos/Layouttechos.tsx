@@ -131,7 +131,7 @@ export function CalculadoraTecho() {
                 <>
                   <CardResult title="Área">{resultado.areaM2} m²</CardResult>
                   {resultado.perimetroM > 0 && (
-                    <CardResult title="Perímetro">{formatearNumero(resultado.perimetroM)} m</CardResult>
+                    <CardResult title="Perímetro">{resultado.perimetroM.toFixed(2)} m</CardResult>
                   )}
                 </>
               )}
