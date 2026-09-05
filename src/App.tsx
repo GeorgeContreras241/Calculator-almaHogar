@@ -12,7 +12,6 @@ function App() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
-
       <main className="max-w-4xl mx-auto px-4 py-8">
         <Tabs value={tab} onValueChange={setTab}>
           <div className="overflow-x-auto -mx-4 px-4">
