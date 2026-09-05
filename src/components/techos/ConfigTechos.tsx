@@ -45,6 +45,7 @@ export function ConfigTechos() {
       ancho: a,
       precioLamina: pl,
       precioM2: pm,
+      
     })
     setConfig(nuevaConfig)
     setNombre("")

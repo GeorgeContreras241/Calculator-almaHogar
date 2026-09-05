@@ -13,7 +13,7 @@ export interface TipoTecho {
   ancho: number
   precioLamina: number
   precioM2: number
-  m2: number
+  m2?: number
 }
 
 export interface Producto {

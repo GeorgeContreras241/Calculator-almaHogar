@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { cargarConfiguracion, formatearMoneda, formatearNumero, calcularMaterialesPorArea, calcularMaterialesTecho } from "@/lib/formulas"
+import { cargarConfiguracion, formatearMoneda, calcularMaterialesPorArea, calcularMaterialesTecho } from "@/lib/formulas"
 import type { Configuracion, Result } from "@/types"
 import { Calculator, Settings } from "lucide-react"
 import { CardResult } from "@/components/ui/cardResult"
@@ -42,6 +42,11 @@ export function CalculadoraTecho() {
       if (isNaN(m) || m <= 0) return
       const perimetroCalculado = Math.sqrt(m) * 4
 
+      if (tipo.m2 === undefined || tipo.m2 <= 0) {
+        console.error("El valor de m2 del tipo de techo es inválido:", tipo.m2);
+        return;
+      }
+      
       const materiales = calcularMaterialesPorArea(m, tipo.m2)
       const perimetral = calcularMaterialesTecho(m)
       setResultado({
