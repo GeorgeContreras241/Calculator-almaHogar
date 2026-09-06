@@ -85,7 +85,7 @@ export function CalculadoraTecho() {
             {config.techos.tipos.map((t) => (
               <button
                 key={t.id}
-                className={`px-4 py-2 ${tipoId === t.id ? "bg-neutral-100 text-neutral-900" : ""} cursor-pointer rounded-r-md h-9`}
+                className={`px-4 py-2 ${tipoId === t.id ? "bg-neutral-100 text-neutral-900" : ""} cursor-pointer rounded-r-md h-fit`}
                 onClick={() => setTipoId(t.id)}
               >
                 {t.nombre} - {formatearMoneda(t.precioLamina)} - {formatearMoneda(t.precioM2)}
@@ -94,9 +94,9 @@ export function CalculadoraTecho() {
           </div>
 
           <div className="grid grid-cols-2 text-sm font-medium border border-gray-800 rounded-md overflow-hidden">
-            <button className={`px-4 py-2 ${modo === "metro" ? "bg-neutral-100 text-neutral-900" : ""} rounded-r-md cursor-pointer h-9`}
+            <button className={`px-4 py-2 ${modo === "metro" ? "bg-neutral-100 text-neutral-900" : ""} rounded-r-md cursor-pointer h-fit`}
               onClick={() => { limpiar(); setModo("metro") }}>Por m²</button>
-            <button className={`px-4 py-2 ${modo === "laminas" ? "bg-neutral-100 text-neutral-900" : ""} rounded-l-md cursor-pointer h-9`}
+            <button className={`px-4 py-2 ${modo === "laminas" ? "bg-neutral-100 text-neutral-900" : ""} rounded-l-md cursor-pointer h-fit`}
               onClick={() => { limpiar(); setModo("laminas") }}>Por lámina</button>
           </div>
 
