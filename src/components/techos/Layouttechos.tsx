@@ -25,11 +25,12 @@ export function CalculadoraTecho() {
   }, [config.techos.tipos, tipoId])
 
   const tipo = config.techos.tipos.find((t) => t.id === tipoId)
-  const calcular = () => {
+
+  useEffect(() => {
     if (!tipo) return
     if (modo === "laminas") {
       const c = parseInt(cantLaminas)
-      if (isNaN(c) || c <= 0) return
+      if (isNaN(c) || c <= 0) { setResultado(null); return }
       setResultado({
         precioUnitario: tipo.precioLamina,
         total: c * tipo.precioLamina,
@@ -39,14 +40,9 @@ export function CalculadoraTecho() {
       })
     } else {
       const m = parseFloat(m2)
-      if (isNaN(m) || m <= 0) return
+      if (isNaN(m) || m <= 0) { setResultado(null); return }
       const perimetroCalculado = Math.sqrt(m) * 4
 
-      if (tipo.m2 === undefined || tipo.m2 <= 0) {
-        console.error("El valor de m2 del tipo de techo es inválido:", tipo.m2);
-        return;
-      }
-      
       const materiales = calcularMaterialesPorArea(m, tipo.m2)
       const perimetral = calcularMaterialesTecho(m)
       setResultado({
@@ -59,7 +55,7 @@ export function CalculadoraTecho() {
         perimetral,
       })
     }
-  }
+  }, [cantLaminas, m2, tipoId, modo, tipo])
 
   const limpiar = () => {
     setCantLaminas(""); 
@@ -85,7 +81,7 @@ export function CalculadoraTecho() {
             {config.techos.tipos.map((t) => (
               <button
                 key={t.id}
-                className={`px-4 py-2 ${tipoId === t.id ? "bg-neutral-100 text-neutral-900" : ""} cursor-pointer rounded-r-md h-fit`}
+                className={`px-4 py-2 ${tipoId === t.id ? "bg-neutral-100 text-neutral-900" : ""} cursor-pointer rounded-r-md h-max`}
                 onClick={() => setTipoId(t.id)}
               >
                 {t.nombre} - {formatearMoneda(t.precioLamina)} - {formatearMoneda(t.precioM2)}
@@ -115,17 +111,16 @@ export function CalculadoraTecho() {
           )}
 
           <div className="flex gap-2">
-            <Button onClick={calcular} className="flex-1" disabled={!tipo}>Calcular</Button>
-            <Button onClick={limpiar} variant="outline">Limpiar</Button>
+            <Button onClick={limpiar} variant="outline" className="flex-1">Limpiar</Button>
           </div>
 
           {resultado && tipo && (
             <div className="rounded-lg border border-border p-3 space-y-1 bg-muted text-sm">
               <div className="flex justify-between items-center">
-                <div className="font-medium text-foreground border-b border-border pb-1 mb-1">Resumen</div>
+                <div className="font-medium text-foreground border-b border-border pb-1 mb-1">Resumen - {tipo?.nombre}</div>
                 {modo === "metro" && resultado && (
                   <span className="text-xs text-muted-foreground">
-                    {(parseFloat(m2) / 1.8).toFixed(2)} → {Math.ceil(parseFloat(m2) / 1.8)} láminas ({(Math.ceil(parseFloat(m2) / 1.8) * 1.8).toFixed(2)} m²)
+                    {(parseFloat(m2) / tipo.m2).toFixed(2)} → {Math.ceil(parseFloat(m2) / tipo.m2)} láminas ({(Math.ceil(parseFloat(m2) / tipo.m2) * tipo.m2).toFixed(2)} m²)
                   </span>
                 )}
               </div>
@@ -134,7 +129,7 @@ export function CalculadoraTecho() {
                 <CardResult title="Láminas">{cantLaminas} piezas</CardResult>
               ) : (
                 <>
-                  <CardResult title="Área">{resultado.areaM2} m²</CardResult>
+                  <CardResult title="Área">{resultado.areaM2.toFixed(2)} m²</CardResult>
                   {resultado.perimetroM > 0 && (
                     <CardResult title="Perímetro">{resultado.perimetroM.toFixed(2)} m</CardResult>
                   )}
