@@ -20,12 +20,14 @@ export function ConfigTechos() {
   const [ancho, setAncho] = useState("")
   const [precioLamina, setPrecioLamina] = useState("")
   const [precioM2, setPrecioM2] = useState("")
+  const [m2, setM2] = useState("")
   const [editandoId, setEditandoId] = useState<string | null>(null)
   const [editNombre, setEditNombre] = useState("")
   const [editLargo, setEditLargo] = useState("")
   const [editAncho, setEditAncho] = useState("")
   const [editPrecioLamina, setEditPrecioLamina] = useState("")
   const [editPrecioM2, setEditPrecioM2] = useState("")
+  const [editM2, setEditM2] = useState("")
 
   useEffect(() => {
     setConfig(cargarConfiguracion())
@@ -36,8 +38,9 @@ export function ConfigTechos() {
     const a = parseFloat(ancho)
     const pl = parseFloat(precioLamina)
     const pm = parseFloat(precioM2)
-    if (!nombre.trim() || isNaN(l) || isNaN(a) || isNaN(pl) || isNaN(pm)) return
-    if (l <= 0 || a <= 0 || pl < 0 || pm < 0) return
+    const m = parseFloat(m2)
+    if (!nombre.trim() || isNaN(l) || isNaN(a) || isNaN(pl) || isNaN(pm) || isNaN(m)) return
+    if (l <= 0 || a <= 0 || pl < 0 || pm < 0 || m <= 0) return
 
     const nuevaConfig = agregarTipoTecho({
       nombre: nombre.trim(),
@@ -45,7 +48,7 @@ export function ConfigTechos() {
       ancho: a,
       precioLamina: pl,
       precioM2: pm,
-      
+      m2: m,
     })
     setConfig(nuevaConfig)
     setNombre("")
@@ -53,6 +56,7 @@ export function ConfigTechos() {
     setAncho("")
     setPrecioLamina("")
     setPrecioM2("")
+    setM2("")
   }
 
   const handleEliminar = (id: string) => {
@@ -67,6 +71,7 @@ export function ConfigTechos() {
     setEditAncho(tipo.ancho.toString())
     setEditPrecioLamina(tipo.precioLamina.toString())
     setEditPrecioM2(tipo.precioM2.toString())
+    setEditM2(tipo.m2.toString())
   }
 
   const handleGuardarEdicion = () => {
@@ -75,7 +80,8 @@ export function ConfigTechos() {
     const a = parseFloat(editAncho)
     const pl = parseFloat(editPrecioLamina)
     const pm = parseFloat(editPrecioM2)
-    if (!editNombre.trim() || isNaN(l) || isNaN(a) || isNaN(pl) || isNaN(pm)) return
+    const m = parseFloat(editM2)
+    if (!editNombre.trim() || isNaN(l) || isNaN(a) || isNaN(pl) || isNaN(pm) || isNaN(m)) return
 
     const nuevaConfig = actualizarTipoTecho(editandoId, {
       nombre: editNombre.trim(),
@@ -83,6 +89,7 @@ export function ConfigTechos() {
       ancho: a,
       precioLamina: pl,
       precioM2: pm,
+      m2: m,
     })
     setConfig(nuevaConfig)
     setEditandoId(null)
@@ -94,7 +101,7 @@ export function ConfigTechos() {
         <CardTitle className="text-lg">Configurar Techos</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-7 gap-3">
           <div className="space-y-2">
             <Label>Nombre</Label>
             <Input placeholder="Ej: Estándar" value={nombre} onChange={(e) => setNombre(e.target.value)} />
@@ -115,6 +122,10 @@ export function ConfigTechos() {
             <Label>Precio m² ($)</Label>
             <Input type="number" placeholder="15" value={precioM2} onChange={(e) => setPrecioM2(e.target.value)} min="0" step="1" />
           </div>
+          <div className="space-y-2">
+            <Label>m² por lámina</Label>
+            <Input type="number" placeholder="1.8" value={m2} onChange={(e) => setM2(e.target.value)} min="0" step="0.01" />
+          </div>
           <div className="flex items-end">
             <Button onClick={handleAgregar} className="w-full gap-1">
               <Plus className="w-4 h-4" /> Agregar
@@ -131,12 +142,13 @@ export function ConfigTechos() {
             config.techos.tipos.map((tipo) => (
               <div key={tipo.id} className="p-3 flex items-center gap-2 text-sm flex-wrap">
                 {editandoId === tipo.id ? (
-                  <div className="grid grid-cols-2 sm:grid-cols-6 gap-2 w-full">
+                  <div className="grid grid-cols-2 sm:grid-cols-7 gap-2 w-full">
                     <Input value={editNombre} onChange={(e) => setEditNombre(e.target.value)} placeholder="Nombre" />
                     <Input type="number" value={editLargo} onChange={(e) => setEditLargo(e.target.value)} placeholder="Largo" />
                     <Input type="number" value={editAncho} onChange={(e) => setEditAncho(e.target.value)} placeholder="Ancho" />
                     <Input type="number" value={editPrecioLamina} onChange={(e) => setEditPrecioLamina(e.target.value)} placeholder="$ Lámina" />
                     <Input type="number" value={editPrecioM2} onChange={(e) => setEditPrecioM2(e.target.value)} placeholder="$ m²" />
+                    <Input type="number" value={editM2} onChange={(e) => setEditM2(e.target.value)} placeholder="m²/lámina" />
                     <div className="flex gap-1">
                       <Button size="icon" variant="ghost" className="h-9 w-9" onClick={handleGuardarEdicion}>
                         <Check className="w-4 h-4 text-green-500" />
@@ -155,6 +167,9 @@ export function ConfigTechos() {
                     </span>
                     <span className="font-mono text-xs border border-border rounded px-2 py-0.5">
                       {formatearMoneda(tipo.precioM2)}/m²
+                    </span>
+                    <span className="font-mono text-xs border border-border rounded px-2 py-0.5">
+                      {tipo.m2} m²/lámina
                     </span>
                     <div className="flex gap-1">
                       <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleEditar(tipo)}>
