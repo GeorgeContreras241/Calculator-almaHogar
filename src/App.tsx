@@ -7,7 +7,7 @@ import { Calculator, Package } from "lucide-react"
 import { Header } from "@/components/ui/header"
 
 function App() {
-  const [tab, setTab] = useState("calc-piso")
+  const [tab, setTab] = useState("calc-techo")
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -16,13 +16,13 @@ function App() {
         <Tabs value={tab} onValueChange={setTab}>
           <div className="overflow-x-auto -mx-4 px-4">
             <TabsList className="w-full justify-start min-w-max">
-              <TabsTrigger value="calc-piso" currentValue={tab} onValueChange={setTab} className="gap-1.5 text-xs sm:text-sm">
-                <Calculator className="w-4 h-4" />
-                <span className="hidden sm:inline">Calcular </span>Piso
-              </TabsTrigger>
               <TabsTrigger value="calc-techo" currentValue={tab} onValueChange={setTab} className="gap-1.5 text-xs sm:text-sm">
                 <Calculator className="w-4 h-4" />
                 <span className="hidden sm:inline">Calcular </span>Techo
+              </TabsTrigger>
+              <TabsTrigger value="calc-piso" currentValue={tab} onValueChange={setTab} className="gap-1.5 text-xs sm:text-sm">
+                <Calculator className="w-4 h-4" />
+                <span className="hidden sm:inline">Calcular </span>Piso
               </TabsTrigger>
               <TabsTrigger value="productos" currentValue={tab} onValueChange={setTab} className="gap-1.5 text-xs sm:text-sm">
                 <Package className="w-4 h-4" />
@@ -32,8 +32,8 @@ function App() {
           </div>
 
           <div className="mt-6">
-            <TabsContent value="calc-piso" currentValue={tab}><CalculadoraPiso /></TabsContent>
             <TabsContent value="calc-techo" currentValue={tab}><CalculadoraTecho /></TabsContent>
+            <TabsContent value="calc-piso" currentValue={tab}><CalculadoraPiso /></TabsContent>
             <TabsContent value="productos" currentValue={tab}><Productos /></TabsContent>
           </div>
         </Tabs>
