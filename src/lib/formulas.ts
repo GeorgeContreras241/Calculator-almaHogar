@@ -5,14 +5,14 @@ const STORAGE_KEY = 'techos-pisos-config'
 const DEFAULT_CONFIG: Configuracion = {
   pisos: {
     tallas: [
-      { id: '1', nombre: '60x60 cm', largo: 60, ancho: 60, precioPorPieza: 85 },
-      { id: '2', nombre: '80x80 cm', largo: 80, ancho: 80, precioPorPieza: 120 },
+      { id: '1', nombre: 'Techo L', largo: 60, ancho: 60, precioPorPieza: 54000 },
+      { id: '2', nombre: 'Techo XL', largo: 80, ancho: 80, precioPorPieza: 55000 },
     ],
   },
   techos: {
     tipos: [
       { id: '1', nombre: 'Techo 30cm', largo: 595, ancho: 30, precioLamina: 27000, precioM2: 23000, m2: 1.8 },
-      { id: '2', nombre: 'Techo 25cm', largo: 595, ancho: 25, precioLamina: 27000, precioM2: 21000, m2: 1.5 },
+      { id: '2', nombre: 'Techo 25cm', largo: 595, ancho: 25, precioLamina: 25000, precioM2: 21000, m2: 1.5 },
     ],
   },
   productos: { items: [] },
@@ -72,7 +72,6 @@ export function actualizarTipoTecho(id: string, datos: Omit<TipoTecho, 'id'>): C
   guardarConfiguracion(c); return c
 }
 export const calcularMaterialesPorArea = (m2: number, areaPorLaminaPVC: number): MaterialesTechoPorArea => {
-  console.log(15/2)
   return {
     laminasPVC: Math.ceil(m2 / areaPorLaminaPVC),
     valorMaterialBruto : m2 / areaPorLaminaPVC,
