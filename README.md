@@ -20,15 +20,23 @@ Calculadora de materiales para instalación de techos, pisos y PVC. Permite calc
 
 ## Instalación
 
+El proyecto usa [pnpm](https://pnpm.io/). Si aún no lo tienes:
+
 ```bash
-npm install
-npm run dev
+corepack enable pnpm
+```
+
+Luego:
+
+```bash
+pnpm install
+pnpm dev
 ```
 
 ## Build
 
 ```bash
-npm run build
+pnpm build
 ```
 
 ## Estructura
