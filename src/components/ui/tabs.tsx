@@ -1,18 +1,22 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
+interface TabsContextValue {
+  value: string
+  onValueChange: (value: string) => void
+}
+
+const TabsContext = React.createContext<TabsContextValue | null>(null)
+
 const Tabs = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & { value: string; onValueChange: (value: string) => void }
 >(({ className, value, onValueChange, children, ...props }, ref) => (
-  <div ref={ref} className={cn("flex flex-col gap-2", className)} {...props}>
-    {React.Children.map(children, (child) => {
-      if (React.isValidElement(child)) {
-        return React.cloneElement(child as React.ReactElement<any>, { value, onValueChange })
-      }
-      return child
-    })}
-  </div>
+  <TabsContext.Provider value={{ value, onValueChange }}>
+    <div ref={ref} className={cn("flex flex-col gap-2", className)} {...props}>
+      {children}
+    </div>
+  </TabsContext.Provider>
 ))
 Tabs.displayName = "Tabs"
 
@@ -33,31 +37,45 @@ TabsList.displayName = "TabsList"
 
 const TabsTrigger = React.forwardRef<
   HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement> & { value: string; currentValue?: string; onValueChange?: (value: string) => void }
->(({ className, value, currentValue, onValueChange, children, ...props }, ref) => (
-  <button
-    ref={ref}
-    className={cn(
-      "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 cursor-pointer",
-      currentValue === value && "bg-background text-foreground shadow-sm",
-      className
-    )}
-    onClick={() => onValueChange?.(value)}
-    {...props}
-  >
-    {children}
-  </button>
-))
+  React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    value: string
+    currentValue?: string
+    onValueChange?: (value: string) => void
+  }
+>(({ className, value, currentValue, onValueChange, children, ...props }, ref) => {
+  const contexto = React.useContext(TabsContext)
+  const activo = (currentValue ?? contexto?.value) === value
+  const cambiar = onValueChange ?? contexto?.onValueChange
+
+  return (
+    <button
+      ref={ref}
+      type="button"
+      className={cn(
+        "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 cursor-pointer",
+        activo && "bg-background text-foreground shadow-sm",
+        className
+      )}
+      {...props}
+      onClick={() => cambiar?.(value)}
+    >
+      {children}
+    </button>
+  )
+})
 TabsTrigger.displayName = "TabsTrigger"
 
 const TabsContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & { value: string; currentValue?: string }
 >(({ className, value, currentValue, children, ...props }, ref) => {
-  if (value !== currentValue) return null
+  const contexto = React.useContext(TabsContext)
+  const activo = (currentValue ?? contexto?.value) === value
+
   return (
     <div
       ref={ref}
+      hidden={!activo}
       className={cn("mt-2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring", className)}
       {...props}
     >

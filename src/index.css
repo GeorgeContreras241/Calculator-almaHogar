@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Fuente base un poco más grande: 16px -> 17px (escala los tamaños en rem). */
+html {
+  font-size: 17px;
+}
+
 @theme {
   --color-background: #ffffff;
   --color-foreground: #09090b;
