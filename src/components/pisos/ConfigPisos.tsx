@@ -1,20 +1,19 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  cargarConfiguracion,
-  agregarTallaPiso,
-  eliminarTallaPiso,
-  actualizarTallaPiso,
-  formatearMoneda,
-} from "@/lib/formulas"
-import type { Configuracion, TallaPiso } from "@/types"
+import { formatearMoneda } from "@/lib/formulas"
+import { useConfigStore } from "@/store/configStore"
+import type { TallaPiso } from "@/types"
 import { Plus, Trash2, Edit2, Check, X } from "lucide-react"
 
 export function ConfigPisos() {
-  const [config, setConfig] = useState<Configuracion>(cargarConfiguracion)
+  const config = useConfigStore((s) => s.config)
+  const agregarTallaPiso = useConfigStore((s) => s.agregarTallaPiso)
+  const actualizarTallaPiso = useConfigStore((s) => s.actualizarTallaPiso)
+  const eliminarTallaPiso = useConfigStore((s) => s.eliminarTallaPiso)
+
   const [nombre, setNombre] = useState("")
   const [largo, setLargo] = useState("")
   const [ancho, setAncho] = useState("")
@@ -25,10 +24,6 @@ export function ConfigPisos() {
   const [editAncho, setEditAncho] = useState("")
   const [editPrecio, setEditPrecio] = useState("")
 
-  useEffect(() => {
-    setConfig(cargarConfiguracion())
-  }, [])
-
   const handleAgregar = () => {
     const l = parseFloat(largo)
     const a = parseFloat(ancho)
@@ -36,13 +31,12 @@ export function ConfigPisos() {
     if (!nombre.trim() || isNaN(l) || isNaN(a) || isNaN(p)) return
     if (l <= 0 || a <= 0 || p < 0) return
 
-    const nuevaConfig = agregarTallaPiso({
+    agregarTallaPiso({
       nombre: nombre.trim(),
       largo: l,
       ancho: a,
-      precioPorPieza: p,
+      precioPorM2: p,
     })
-    setConfig(nuevaConfig)
     setNombre("")
     setLargo("")
     setAncho("")
@@ -50,8 +44,7 @@ export function ConfigPisos() {
   }
 
   const handleEliminar = (id: string) => {
-    const nuevaConfig = eliminarTallaPiso(id)
-    setConfig(nuevaConfig)
+    eliminarTallaPiso(id)
   }
 
   const handleEditar = (talla: TallaPiso) => {
@@ -59,7 +52,7 @@ export function ConfigPisos() {
     setEditNombre(talla.nombre)
     setEditLargo(talla.largo.toString())
     setEditAncho(talla.ancho.toString())
-    setEditPrecio(talla.precioPorPieza.toString())
+    setEditPrecio(talla.precioPorM2.toString())
   }
 
   const handleGuardarEdicion = () => {
@@ -68,14 +61,14 @@ export function ConfigPisos() {
     const a = parseFloat(editAncho)
     const p = parseFloat(editPrecio)
     if (!editNombre.trim() || isNaN(l) || isNaN(a) || isNaN(p)) return
+    if (l <= 0 || a <= 0 || p < 0) return
 
-    const nuevaConfig = actualizarTallaPiso(editandoId, {
+    actualizarTallaPiso(editandoId, {
       nombre: editNombre.trim(),
       largo: l,
       ancho: a,
-      precioPorPieza: p,
+      precioPorM2: p,
     })
-    setConfig(nuevaConfig)
     setEditandoId(null)
   }
 
@@ -142,12 +135,12 @@ export function ConfigPisos() {
 
         <div className="border border-gray-800 rounded-lg divide-y divide-gray-700">
           {config.pisos.tallas.length === 0 ? (
-            <p className="p-4 text-sm text-muted-foreground text-center">
+            <p className="p-2 sm:p-4 text-sm text-muted-foreground text-center">
               No hay tallas configuradas
             </p>
           ) : (
             config.pisos.tallas.map((talla) => (
-              <div key={talla.id} className="p-3 flex items-center gap-3 text-sm">
+              <div key={talla.id} className="p-2 sm:p-3 flex items-center gap-2 sm:gap-3 text-sm">
                 {editandoId === talla.id ? (
                   <>
                     <Input
@@ -155,6 +148,7 @@ export function ConfigPisos() {
                       onChange={(e) => setEditNombre(e.target.value)}
                       className="w-40"
                       placeholder="Nombre"
+                      aria-label="Nombre de la talla"
                     />
                     <Input
                       type="number"
@@ -162,6 +156,8 @@ export function ConfigPisos() {
                       onChange={(e) => setEditLargo(e.target.value)}
                       className="w-20"
                       placeholder="Largo"
+                      aria-label="Largo en centímetros"
+                      min="1"
                     />
                     <span className="text-muted-foreground">×</span>
                     <Input
@@ -170,6 +166,8 @@ export function ConfigPisos() {
                       onChange={(e) => setEditAncho(e.target.value)}
                       className="w-20"
                       placeholder="Ancho"
+                      aria-label="Ancho en centímetros"
+                      min="1"
                     />
                     <span className="text-muted-foreground">cm - $</span>
                     <Input
@@ -178,11 +176,13 @@ export function ConfigPisos() {
                       onChange={(e) => setEditPrecio(e.target.value)}
                       className="w-24"
                       placeholder="Precio"
+                      aria-label="Precio por metro cuadrado"
+                      min="0"
                     />
-                    <Button size="icon" variant="ghost" onClick={handleGuardarEdicion}>
+                    <Button size="icon" variant="ghost" onClick={handleGuardarEdicion} aria-label="Guardar cambios">
                       <Check className="w-4 h-4 text-green-600" />
                     </Button>
-                    <Button size="icon" variant="ghost" onClick={handleCancelarEdicion}>
+                    <Button size="icon" variant="ghost" onClick={handleCancelarEdicion} aria-label="Cancelar edición">
                       <X className="w-4 h-4 text-red-600" />
                     </Button>
                   </>
@@ -190,14 +190,14 @@ export function ConfigPisos() {
                   <>
                     <span className="font-medium flex-1">{talla.nombre}</span>
                     <span className="text-muted-foreground">{talla.largo}×{talla.ancho} cm</span>
-                    <span className="font-mono">{formatearMoneda(talla.precioPorPieza)}/pza</span>
+                    <span className="font-mono">{formatearMoneda(talla.precioPorM2)}/m²</span>
                     {/* <span className="text-xs text-muted-foreground border rounded px-2 py-0.5">
                       ≈ {formatearMoneda(precioM2(talla))}/m²
                     </span> */}
-                    <Button size="icon" variant="ghost" onClick={() => handleEditar(talla)}>
+                    <Button size="icon" variant="ghost" onClick={() => handleEditar(talla)} aria-label={`Editar ${talla.nombre}`}>
                       <Edit2 className="w-4 h-4" />
                     </Button>
-                    <Button size="icon" variant="ghost" onClick={() => handleEliminar(talla.id)}>
+                    <Button size="icon" variant="ghost" onClick={() => handleEliminar(talla.id)} aria-label={`Eliminar ${talla.nombre}`}>
                       <Trash2 className="w-4 h-4 text-red-500" />
                     </Button>
                   </>

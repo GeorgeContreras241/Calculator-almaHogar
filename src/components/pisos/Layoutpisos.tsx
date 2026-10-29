@@ -1,15 +1,16 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { cargarConfiguracion, calcularM2, calcularPrecioTotal, formatearMoneda, formatearNumero } from "@/lib/formulas"
-import type { Configuracion, ResultadoCalculo } from "@/types"
+import { calcularM2, calcularPiezasPiso, calcularPrecioTotal, formatearMoneda, formatearNumero } from "@/lib/formulas"
+import { useConfigStore } from "@/store/configStore"
+import type { ResultadoCalculo } from "@/types"
 import { Calculator, Settings } from "lucide-react"
 import { ConfigPisos } from "@/components/pisos/ConfigPisos"
 
 export function CalculadoraPiso() {
-  const [config, setConfig] = useState<Configuracion>(cargarConfiguracion)
+  const config = useConfigStore((s) => s.config)
   const [configOpen, setConfigOpen] = useState(false)
   const [tallaId, setTallaId] = useState("")
   const [modo, setModo] = useState<"medida" | "mt2">("medida")
@@ -17,13 +18,8 @@ export function CalculadoraPiso() {
   const [areaM, setAreaM] = useState("")
   const [resultado, setResultado] = useState<ResultadoCalculo | null>(null)
 
-  useEffect(() => { setConfig(cargarConfiguracion()) }, [])
-
-  useEffect(() => {
-    if (config.pisos.tallas.length > 0 && !tallaId) setTallaId(config.pisos.tallas[0].id)
-  }, [config.pisos.tallas, tallaId])
-
-  const talla = config.pisos.tallas.find((t) => t.id === tallaId)
+  const tallas = config.pisos.tallas
+  const talla = tallas.find((t) => t.id === tallaId) ?? tallas[0]
 
   const calcular = () => {
     if (!talla) return
@@ -31,20 +27,24 @@ export function CalculadoraPiso() {
       const l = parseFloat(area.largo), a = parseFloat(area.ancho)
       if (isNaN(l) || isNaN(a) || l <= 0 || a <= 0) return
       const m2 = calcularM2(l, a)
-      const periemtroEstimado: number = (Math.sqrt(m2) * 4) / 2.44
-      setResultado({ areaM2: m2, precioTotal: calcularPrecioTotal(m2, talla.precioPorPieza), perimetroM: periemtroEstimado })
+      const perimetroEstimado = (Math.sqrt(m2) * 4) / 2.44
+      setResultado({ areaM2: m2, perimetroM: perimetroEstimado })
     } else {
       const m2 = parseFloat(areaM)
-      const periemtroEstimado: number = (Math.sqrt(m2) * 4) / 2.44
       if (isNaN(m2) || m2 <= 0) return
-      setResultado({ areaM2: m2, precioTotal: calcularPrecioTotal(m2, talla.precioPorPieza), perimetroM: periemtroEstimado })
+      const perimetroEstimado = (Math.sqrt(m2) * 4) / 2.44
+      setResultado({ areaM2: m2, perimetroM: perimetroEstimado })
     }
   }
 
   const limpiar = () => { setArea({ largo: "", ancho: "" }); setAreaM(""); setResultado(null) }
 
-  const opciones = config.pisos.tallas.map((t) => ({
-    value: t.id, label: `${t.nombre} - ${t.largo}×${t.ancho} cm - ${formatearMoneda(t.precioPorPieza)}/pza`
+  const piezas = resultado && talla
+    ? calcularPiezasPiso(resultado.areaM2, talla.largo, talla.ancho)
+    : 0
+
+  const opciones = tallas.map((t) => ({
+    value: t.id, label: `${t.nombre} - ${t.largo}×${t.ancho} cm - ${formatearMoneda(t.precioPorM2)}/m²`
   }))
 
   return (
@@ -52,18 +52,17 @@ export function CalculadoraPiso() {
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
           <Calculator className="w-5 h-5" /> Calculadora de Piso
-          <button className="ml-auto text-muted-foreground hover:text-foreground cursor-pointer" onClick={() => setConfigOpen(!configOpen)}>
+          <button type="button" aria-label="Configurar pisos" className="ml-auto text-muted-foreground hover:text-foreground cursor-pointer" onClick={() => setConfigOpen(!configOpen)}>
             <Settings className="w-5 h-5" />
           </button>
         </CardTitle>
       </CardHeader>
       {
         !configOpen ? (
-          // S
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>Talla del piso</Label>
-              <select value={tallaId} onChange={(e) => setTallaId(e.target.value)}
+              <Label htmlFor="talla-piso">Talla del piso</Label>
+              <select id="talla-piso" value={talla?.id ?? ""} onChange={(e) => { setTallaId(e.target.value); setResultado(null) }}
                 className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-base shadow-sm md:text-sm">
                 {opciones.length === 0
                   ? <option value="">No hay tallas configuradas</option>
@@ -72,8 +71,8 @@ export function CalculadoraPiso() {
             </div>
 
             <div className="grid grid-cols-2 text-sm font-medium border border-gray-800 rounded-md overflow-hidden">
-              <button className={`px-4 py-2 ${modo === "medida" ? "bg-neutral-100 text-neutral-900" : ""} rounded-l-md cursor-pointer h-9`} onClick={() => setModo("medida")}>Medida</button>
-              <button className={`px-4 py-2 ${modo === "mt2" ? "bg-neutral-100 text-neutral-900" : ""} rounded-r-md cursor-pointer h-9`} onClick={() => setModo("mt2")}>Mt²</button>
+              <button type="button" className={`px-4 py-2 ${modo === "medida" ? "bg-neutral-100 text-neutral-900" : ""} rounded-l-md cursor-pointer h-9`} onClick={() => { setModo("medida"); setResultado(null) }}>Medida</button>
+              <button type="button" className={`px-4 py-2 ${modo === "mt2" ? "bg-neutral-100 text-neutral-900" : ""} rounded-r-md cursor-pointer h-9`} onClick={() => { setModo("mt2"); setResultado(null) }}>Mt²</button>
             </div>
 
             {modo === "medida" ? (
@@ -112,17 +111,21 @@ export function CalculadoraPiso() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Precio:</span>
-                  <span className="font-medium">{formatearMoneda(talla.precioPorPieza)}/pza</span>
+                  <span className="font-medium">{formatearMoneda(talla.precioPorM2)}/m²</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Gaurda Escobas estimado:</span>
+                  <span className="text-muted-foreground">Piezas de piso:</span>
+                  <span className="font-medium">{piezas} piezas</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Guardaescobas estimado:</span>
                   <span className="font-medium">{resultado.perimetroM?.toFixed(2)} piezas</span>
                 </div>
 
                 <div className="border-t border-border pt-1 mt-1">
                   <div className="flex justify-between items-center">
                     <span className="font-semibold">Total:</span>
-                    <span className="font-bold text-lg text-primary">{formatearMoneda(resultado.precioTotal ?? 0)}</span>
+                    <span className="font-bold text-lg text-primary">{formatearMoneda(calcularPrecioTotal(resultado.areaM2, talla.precioPorM2))}</span>
                   </div>
                 </div>
               </div>

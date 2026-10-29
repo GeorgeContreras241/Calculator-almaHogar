@@ -3,7 +3,7 @@ export interface TallaPiso {
   nombre: string
   largo: number
   ancho: number
-  precioPorPieza: number
+  precioPorM2: number
 }
 
 export interface TipoTecho {
@@ -38,7 +38,6 @@ export interface Configuracion {
 
 export interface ResultadoCalculo {
   areaM2: number
-  precioTotal?: number
   perimetroM?: number
 }
 
@@ -47,14 +46,12 @@ export interface MaterialesTechoPorArea {
   valorMaterialBruto : number
   omegas: number
   viguetas: number
-  tornillosEstructura: number
-  tornillosPVC: number
-  chazosTecho: number
+  tornillosBlancos: number
+  tornillosNegros: number
 }
 export interface MaterialesTecho {
   perimetralPlastico?: number
   angulos?: number
-  chazosPared?: number
 }
 
 export interface Result {

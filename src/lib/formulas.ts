@@ -1,12 +1,12 @@
-import type { Configuracion, TallaPiso, TipoTecho, Producto, MaterialesTechoPorArea,MaterialesTecho } from '@/types'
+import type { Configuracion, MaterialesTechoPorArea, MaterialesTecho, TallaPiso } from '@/types'
 
-const STORAGE_KEY = 'techos-pisos-config'
+export const STORAGE_KEY = 'techos-pisos-config'
 
 const DEFAULT_CONFIG: Configuracion = {
   pisos: {
     tallas: [
-      { id: '1', nombre: 'Techo L', largo: 60, ancho: 60, precioPorPieza: 54000 },
-      { id: '2', nombre: 'Techo XL', largo: 80, ancho: 80, precioPorPieza: 55000 },
+      { id: '1', nombre: 'Techo L', largo: 60, ancho: 60, precioPorM2: 54000 },
+      { id: '2', nombre: 'Techo XL', largo: 80, ancho: 80, precioPorM2: 55000 },
     ],
   },
   techos: {
@@ -18,70 +18,98 @@ const DEFAULT_CONFIG: Configuracion = {
   productos: { items: [] },
 }
 
+interface ConfiguracionGuardada {
+  pisos?: { tallas?: unknown }
+  techos?: { tipos?: unknown }
+  productos?: { items?: unknown; productos?: unknown }
+}
+
+function esArreglo<T>(valor: unknown): valor is T[] {
+  return Array.isArray(valor)
+}
+
+function configuracionPorDefecto(): Configuracion {
+  return structuredClone(DEFAULT_CONFIG)
+}
+
+type TallaPisoGuardada = Partial<TallaPiso> & { precioPorPieza?: number }
+
+// Compatibilidad: versiones anteriores guardaban el precio por m² como precioPorPieza.
+function migrarTallaPiso(talla: TallaPisoGuardada): TallaPiso {
+  const { precioPorPieza, ...resto } = talla
+  return {
+    ...(resto as TallaPiso),
+    precioPorM2: talla.precioPorM2 ?? precioPorPieza ?? 0,
+  }
+}
+
 export function cargarConfiguracion(): Configuracion {
   try {
     const data = localStorage.getItem(STORAGE_KEY)
-    if (!data) return DEFAULT_CONFIG
-    const p = JSON.parse(data)
-    const viejos = p.productos?.productos || []
+    if (!data) return configuracionPorDefecto()
+
+    const guardada = JSON.parse(data) as ConfiguracionGuardada
+    const porDefecto = configuracionPorDefecto()
+
+    const tallasGuardadas = guardada.pisos?.tallas
+    const tiposGuardados = guardada.techos?.tipos
+    const itemsGuardados = guardada.productos?.items ?? guardada.productos?.productos
+
     return {
-      pisos: p.pisos || DEFAULT_CONFIG.pisos,
-      techos: p.techos || DEFAULT_CONFIG.techos,
-      productos: p.productos?.items ? p.productos : { items: viejos },
+      pisos: {
+        tallas: esArreglo<TallaPisoGuardada>(tallasGuardadas)
+          ? tallasGuardadas.map(migrarTallaPiso)
+          : porDefecto.pisos.tallas,
+      },
+      techos: {
+        tipos: esArreglo<Configuracion['techos']['tipos'][number]>(tiposGuardados)
+          ? tiposGuardados
+          : porDefecto.techos.tipos,
+      },
+      productos: {
+        items: esArreglo<Configuracion['productos']['items'][number]>(itemsGuardados)
+          ? itemsGuardados
+          : porDefecto.productos.items,
+      },
     }
-  } catch { return DEFAULT_CONFIG }
-}
-
-function guardarConfiguracion(config: Configuracion): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(config))
-}
-
-// Pisos
-export function agregarTallaPiso(t: Omit<TallaPiso, 'id'>): Configuracion {
-  const c = cargarConfiguracion()
-  c.pisos.tallas.push({ ...t, id: Date.now().toString() })
-  guardarConfiguracion(c); return c
-}
-export function eliminarTallaPiso(id: string): Configuracion {
-  const c = cargarConfiguracion()
-  c.pisos.tallas = c.pisos.tallas.filter((t) => t.id !== id)
-  guardarConfiguracion(c); return c
-}
-export function actualizarTallaPiso(id: string, datos: Omit<TallaPiso, 'id'>): Configuracion {
-  const c = cargarConfiguracion()
-  const i = c.pisos.tallas.findIndex((t) => t.id === id)
-  if (i !== -1) c.pisos.tallas[i] = { ...datos, id }
-  guardarConfiguracion(c); return c
-}
-
-// Techos
-export function agregarTipoTecho(t: Omit<TipoTecho, 'id'>): Configuracion {
-  const c = cargarConfiguracion()
-  c.techos.tipos.push({ ...t, id: Date.now().toString() })
-  guardarConfiguracion(c); return c
-}
-export function eliminarTipoTecho(id: string): Configuracion {
-  const c = cargarConfiguracion()
-  c.techos.tipos = c.techos.tipos.filter((t) => t.id !== id)
-  guardarConfiguracion(c); return c
-}
-export function actualizarTipoTecho(id: string, datos: Omit<TipoTecho, 'id'>): Configuracion {
-  const c = cargarConfiguracion()
-  const i = c.techos.tipos.findIndex((t) => t.id === id)
-  if (i !== -1) c.techos.tipos[i] = { ...datos, id }
-  guardarConfiguracion(c); return c
-}
-export const calcularMaterialesPorArea = (m2: number, areaPorLaminaPVC: number): MaterialesTechoPorArea => {
-  return {
-    laminasPVC: Math.ceil(m2 / areaPorLaminaPVC),
-    valorMaterialBruto : m2 / areaPorLaminaPVC,
-    omegas: m2  / 2,
-    viguetas: (m2 / 2) / 2,
-    tornillosEstructura: m2 * 10,
-    tornillosPVC: Math.ceil(m2 * 10),
-    chazosTecho: Math.ceil(m2 * 1.25),
+  } catch {
+    return configuracionPorDefecto()
   }
 }
+
+export function guardarConfiguracion(config: Configuracion): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(config))
+  } catch (error) {
+    console.error('No se pudo guardar la configuración', error)
+  }
+}
+
+export const calcularMaterialesPorArea = (m2: number, areaPorLaminaPVC: number): MaterialesTechoPorArea => {
+  if (m2 <= 0 || areaPorLaminaPVC <= 0) {
+    return {
+      laminasPVC: 0,
+      valorMaterialBruto: 0,
+      omegas: 0,
+      viguetas: 0,
+      tornillosBlancos: 0,
+      tornillosNegros: 0,
+    }
+  }
+
+  const laminasPVC = Math.ceil(m2 / areaPorLaminaPVC)
+  const tornillosBlancos = laminasPVC * 10
+
+  return {
+    laminasPVC,
+    valorMaterialBruto: m2 / areaPorLaminaPVC,
+    omegas: m2 / 2,
+    viguetas: (m2 / 2) / 2,
+    tornillosBlancos,
+    tornillosNegros: tornillosBlancos / 2,
+  }
+}
+
 export function calcularMaterialesTecho(
   area: number
 ): MaterialesTecho {
@@ -89,53 +117,21 @@ export function calcularMaterialesTecho(
   return {
     perimetralPlastico: perimetro / 5.95,
     angulos: perimetro / 2.44,
-    chazosPared: perimetro / 0.4,
   }
-}
-// Productos (unificado)
-export function agregarProducto(p: Omit<Producto, 'id'>): Configuracion {
-  const c = cargarConfiguracion()
-  c.productos.items.push({ ...p, id: Date.now().toString() })
-  guardarConfiguracion(c); return c
-}
-export function eliminarProducto(id: string): Configuracion {
-  const c = cargarConfiguracion()
-  c.productos.items = c.productos.items.filter((p) => p.id !== id)
-  guardarConfiguracion(c); return c
-}
-export function actualizarProducto(id: string, datos: Omit<Producto, 'id'>): Configuracion {
-  const c = cargarConfiguracion()
-  const i = c.productos.items.findIndex((p) => p.id === id)
-  if (i !== -1) c.productos.items[i] = { ...datos, id }
-  guardarConfiguracion(c); return c
-}
-
-export function importarProductos(texto: string): Configuracion {
-  const c = cargarConfiguracion()
-  const lineas = texto.trim().split('\n')
-  for (const linea of lineas) {
-    const partes = linea.split('\t')
-    if (partes.length >= 2) {
-      c.productos.items.push({
-        id: Date.now().toString() + Math.random().toString(36).slice(2, 6),
-        nombre: partes[0].trim(),
-        unidad: 'pieza',
-        precio: 0,
-        cantidad: parseInt(partes[1]) || 0,
-        vendidos: parseInt(partes[2]) || 0,
-      })
-    }
-  }
-  guardarConfiguracion(c); return c
 }
 
 // Fórmulas
 export function calcularM2(largo: number, ancho: number): number { return largo * ancho }
-export function calcularMerma(area: number, pct: number): number { return area * (1 + pct / 100) }
-export function calcularPrecioTotal(cant: number, precio: number): number { return cant * precio }
+export function calcularPrecioTotal(cantidad: number, precioUnitario: number): number {
+  return cantidad * precioUnitario
+}
+
+// Convierte el área a piezas completas según las medidas de la pieza (en cm).
+export function calcularPiezasPiso(areaM2: number, largoCm: number, anchoCm: number): number {
+  const areaPieza = (largoCm / 100) * (anchoCm / 100)
+  if (areaM2 <= 0 || areaPieza <= 0) return 0
+  return Math.ceil(areaM2 / areaPieza)
+}
+
 export function formatearMoneda(v: number): string { return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(v) }
 export function formatearNumero(v: number): string { return Math.round(v).toString() }
-export function redondearArribaDecimal(numero: number, decimales: number): number {
-  let factor = Math.pow(10, decimales);
-  return Math.ceil(numero * factor) / factor;
-}
