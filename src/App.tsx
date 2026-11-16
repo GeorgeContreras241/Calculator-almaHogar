@@ -2,8 +2,7 @@ import { useState } from "react"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { CalculadoraPiso } from "@/components/pisos/Layoutpisos"
 import { CalculadoraTecho } from "@/components/techos/Layouttechos"
-import { Productos } from "@/components/Productos"
-import { Calculator, Package } from "lucide-react"
+import { Calculator } from "lucide-react"
 import { Header } from "@/components/ui/header"
 
 function App() {
@@ -24,17 +23,12 @@ function App() {
                 <Calculator className="w-4 h-4" />
                 <span className="hidden sm:inline">Calcular </span>Piso
               </TabsTrigger>
-              <TabsTrigger value="productos" className="gap-1.5 text-xs sm:text-sm">
-                <Package className="w-4 h-4" />
-                Productos
-              </TabsTrigger>
             </TabsList>
           </div>
 
           <div className="mt-2 sm:mt-6">
             <TabsContent value="calc-techo"><CalculadoraTecho /></TabsContent>
             <TabsContent value="calc-piso"><CalculadoraPiso /></TabsContent>
-            <TabsContent value="productos"><Productos /></TabsContent>
           </div>
         </Tabs>
       </main>

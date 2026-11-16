@@ -15,13 +15,11 @@ const DEFAULT_CONFIG: Configuracion = {
       { id: '2', nombre: 'Techo 25cm', largo: 595, ancho: 25, precioLamina: 25000, precioM2: 21000, m2: 1.5 },
     ],
   },
-  productos: { items: [] },
 }
 
 interface ConfiguracionGuardada {
   pisos?: { tallas?: unknown }
   techos?: { tipos?: unknown }
-  productos?: { items?: unknown; productos?: unknown }
 }
 
 function esArreglo<T>(valor: unknown): valor is T[] {
@@ -53,7 +51,6 @@ export function cargarConfiguracion(): Configuracion {
 
     const tallasGuardadas = guardada.pisos?.tallas
     const tiposGuardados = guardada.techos?.tipos
-    const itemsGuardados = guardada.productos?.items ?? guardada.productos?.productos
 
     return {
       pisos: {
@@ -65,11 +62,6 @@ export function cargarConfiguracion(): Configuracion {
         tipos: esArreglo<Configuracion['techos']['tipos'][number]>(tiposGuardados)
           ? tiposGuardados
           : porDefecto.techos.tipos,
-      },
-      productos: {
-        items: esArreglo<Configuracion['productos']['items'][number]>(itemsGuardados)
-          ? itemsGuardados
-          : porDefecto.productos.items,
       },
     }
   } catch {

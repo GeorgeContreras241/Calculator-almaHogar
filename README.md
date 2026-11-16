@@ -6,7 +6,6 @@ Calculadora de materiales para instalación de techos, pisos y PVC. Permite calc
 
 - **Calculadora de Piso** — por medida (largo × ancho) o directo en m², con precio por m² y número de piezas necesarias
 - **Calculadora de Techo** — por lámina o por m², con materiales (láminas PVC, ómegas, viguetas, tornillos, chazos) y perimetral
-- **Catálogo de Productos** — lista de productos con precios, búsqueda, importación y edición
 - **Configuración inline** — agregar/editar/eliminar tallas de piso y tipos de techo directo desde cada calculadora
 - **Persistencia** — toda la configuración se guarda automáticamente en `localStorage` y se sincroniza entre pestañas
 - **Dark mode** — tema oscuro nativo, optimizado para uso en móvil
@@ -50,7 +49,6 @@ src/
 │   ├── techos/
 │   │   ├── Layouttechos.tsx       # Calculadora de techo con config inline
 │   │   └── ConfigTechos.tsx       # Configuración de tipos y precios
-│   ├── Productos.tsx              # Catálogo de productos
 │   └── ui/                        # Componentes base (Button, Card, Input, Tabs, etc.)
 ├── lib/
 │   ├── formulas.ts                # Cálculos y persistencia en localStorage
