@@ -70,9 +70,9 @@ export function CalculadoraPiso() {
               </select>
             </div>
 
-            <div className="grid grid-cols-2 text-sm font-medium border border-gray-800 rounded-md overflow-hidden">
-              <button type="button" className={`px-4 py-2 ${modo === "medida" ? "bg-neutral-100 text-neutral-900" : ""} rounded-l-md cursor-pointer h-9`} onClick={() => { setModo("medida"); setResultado(null) }}>Medida</button>
-              <button type="button" className={`px-4 py-2 ${modo === "mt2" ? "bg-neutral-100 text-neutral-900" : ""} rounded-r-md cursor-pointer h-9`} onClick={() => { setModo("mt2"); setResultado(null) }}>Mt²</button>
+            <div className="grid grid-cols-2 text-xs font-medium border border-border rounded-md overflow-hidden text-muted-foreground">
+              <button type="button" className={`px-3 py-1.5 cursor-pointer transition-colors ${modo === "medida" ? "bg-foreground/10 text-foreground" : "hover:bg-foreground/5"}`} onClick={() => { setModo("medida"); setResultado(null) }}>Medida</button>
+              <button type="button" className={`px-3 py-1.5 cursor-pointer transition-colors ${modo === "mt2" ? "bg-foreground/10 text-foreground" : "hover:bg-foreground/5"}`} onClick={() => { setModo("mt2"); setResultado(null) }}>Mt²</button>
             </div>
 
             {modo === "medida" ? (
