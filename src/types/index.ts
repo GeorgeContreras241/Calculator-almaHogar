@@ -16,6 +16,25 @@ export interface TipoTecho {
   m2: number
 }
 
+export type FormaPlano = "rectangulo" | "L"
+
+// Medidas de una pieza para cálculo y dibujo (en metros).
+// La forma "L" equivale al rectángulo ancho×alto menos una esquina de recorteAncho×recorteAlto.
+export interface MedidaPlano {
+  forma?: FormaPlano
+  ancho: number
+  alto: number
+  recorteAncho?: number
+  recorteAlto?: number
+  cantidad?: number
+}
+
+export interface TotalesMedidas {
+  piezas: number
+  areaM2: number
+  perimetroM: number
+}
+
 interface ConfigPisos { tallas: TallaPiso[] }
 interface ConfigTechos { tipos: TipoTecho[] }
 

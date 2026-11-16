@@ -1,4 +1,4 @@
-import type { Configuracion, MaterialesTechoPorArea, MaterialesTecho, TallaPiso } from '@/types'
+import type { Configuracion, MaterialesTechoPorArea, MaterialesTecho, MedidaPlano, TallaPiso, TotalesMedidas } from '@/types'
 
 export const STORAGE_KEY = 'techos-pisos-config'
 
@@ -123,6 +123,51 @@ export function calcularPiezasPiso(areaM2: number, largoCm: number, anchoCm: num
   const areaPieza = (largoCm / 100) * (anchoCm / 100)
   if (areaM2 <= 0 || areaPieza <= 0) return 0
   return Math.ceil(areaM2 / areaPieza)
+}
+
+function limitar(valor: number | undefined, maximo: number): number {
+  if (valor === undefined || !Number.isFinite(valor)) return 0
+  return Math.min(Math.max(valor, 0), maximo)
+}
+
+// Perímetro exterior de un rectángulo con una esquina recortada (L).
+// Si el recorte ocupa una dimensión completa, la figura degenera en un rectángulo menor.
+function perimetroForma(
+  ancho: number,
+  alto: number,
+  recorteAncho: number,
+  recorteAlto: number
+): number {
+  if (recorteAncho <= 0 || recorteAlto <= 0) return 2 * (ancho + alto)
+  if (recorteAncho >= ancho && recorteAlto >= alto) return 0
+  if (recorteAncho >= ancho) return 2 * (ancho + alto - recorteAlto)
+  if (recorteAlto >= alto) return 2 * (ancho + alto - recorteAncho)
+  return 2 * (ancho + alto)
+}
+
+// Suma área y perímetro de varias piezas (medidas en metros).
+// Las filas con medidas o cantidad inválidas se ignoran.
+export function calcularTotalesPiezas(piezas: MedidaPlano[]): TotalesMedidas {
+  return piezas.reduce<TotalesMedidas>(
+    (totales, pieza) => {
+      const { ancho, alto, cantidad = 1 } = pieza
+      if (!(ancho > 0) || !(alto > 0) || !(cantidad > 0)) return totales
+
+      const esL = pieza.forma === "L"
+      const recorteAncho = esL ? limitar(pieza.recorteAncho, ancho) : 0
+      const recorteAlto = esL ? limitar(pieza.recorteAlto, alto) : 0
+      const area = Math.max(0, ancho * alto - recorteAncho * recorteAlto)
+
+      return {
+        piezas: totales.piezas + cantidad,
+        areaM2: totales.areaM2 + area * cantidad,
+        perimetroM:
+          totales.perimetroM +
+          perimetroForma(ancho, alto, recorteAncho, recorteAlto) * cantidad,
+      }
+    },
+    { piezas: 0, areaM2: 0, perimetroM: 0 }
+  )
 }
 
 export function formatearMoneda(v: number): string { return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(v) }
