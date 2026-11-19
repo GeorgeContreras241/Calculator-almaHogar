@@ -1,5 +1,5 @@
 import { CardResult } from "@/components/ui/cardResult"
-import { formatearMoneda } from "@/lib/formulas"
+import { areaLamina, formatearMoneda } from "@/lib/formulas"
 import type { Result, TipoTecho } from "@/types"
 
 interface ResultadoTechoProps {
@@ -8,18 +8,23 @@ interface ResultadoTechoProps {
   modo: "laminas" | "metro"
   cantLaminas: string
   m2: string
+  piezas?: number
 }
 
-export function ResultadoTecho({ resultado, tipo, modo, cantLaminas, m2 }: ResultadoTechoProps) {
+export function ResultadoTecho({ resultado, tipo, modo, cantLaminas, m2, piezas }: ResultadoTechoProps) {
+  const areaPorLamina = areaLamina(tipo)
+  const areaIngresada = parseFloat(m2)
+  const laminasExactas = areaPorLamina > 0 ? areaIngresada / areaPorLamina : 0
+
   return (
     <div className="rounded-lg border border-border p-3 space-y-1 bg-muted text-sm">
       <div className="flex justify-between items-center">
         <div className="font-medium text-foreground border-b border-border pb-1 mb-1">
           Resumen - {tipo.nombre}
         </div>
-        {modo === "metro" && (
+        {modo === "metro" && areaPorLamina > 0 && (
           <span className="text-xs text-muted-foreground">
-            {(parseFloat(m2) / tipo.m2).toFixed(2)} → {Math.ceil(parseFloat(m2) / tipo.m2)} láminas ({(Math.ceil(parseFloat(m2) / tipo.m2) * tipo.m2).toFixed(2)} m²)
+            {laminasExactas.toFixed(2)} → {Math.ceil(laminasExactas)} láminas ({(Math.ceil(laminasExactas) * areaPorLamina).toFixed(2)} m²)
           </span>
         )}
       </div>
@@ -28,6 +33,7 @@ export function ResultadoTecho({ resultado, tipo, modo, cantLaminas, m2 }: Resul
         <CardResult title="Láminas">{cantLaminas} piezas</CardResult>
       ) : (
         <>
+          {piezas !== undefined && <CardResult title="Piezas">{piezas}</CardResult>}
           <CardResult title="Área">{resultado.areaM2.toFixed(2)} m²</CardResult>
           {resultado.perimetroM > 0 && (
             <CardResult title="Perímetro">{resultado.perimetroM.toFixed(2)} m</CardResult>

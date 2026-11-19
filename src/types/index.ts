@@ -13,7 +13,6 @@ export interface TipoTecho {
   ancho: number
   precioLamina: number
   precioM2: number
-  m2: number
 }
 
 export type FormaPlano = "rectangulo" | "L"
@@ -69,5 +68,4 @@ export interface Result {
   modelo: string
   materiales?: MaterialesTechoPorArea
   perimetral?: MaterialesTecho
-  valorMaterialBruto?: MaterialesTechoPorArea
 }

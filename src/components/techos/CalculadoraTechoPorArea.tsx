@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
+  areaLamina,
   calcularMaterialesPorArea,
   calcularMaterialesTecho,
   formatearMoneda,
@@ -34,7 +35,8 @@ function calcularResultado(
   }
 
   const m = parseFloat(m2)
-  if (isNaN(m) || m <= 0 || tipo.m2 <= 0) return null
+  const areaPorLamina = areaLamina(tipo)
+  if (isNaN(m) || m <= 0 || areaPorLamina <= 0) return null
 
   return {
     precioUnitario: tipo.precioM2,
@@ -42,7 +44,7 @@ function calcularResultado(
     areaM2: m,
     perimetroM: Math.sqrt(m) * 4,
     modelo,
-    materiales: calcularMaterialesPorArea(m, tipo.m2),
+    materiales: calcularMaterialesPorArea(m, areaPorLamina),
     perimetral: calcularMaterialesTecho(m),
   }
 }

@@ -1,4 +1,4 @@
-import type { Configuracion, MaterialesTechoPorArea, MaterialesTecho, MedidaPlano, TallaPiso, TotalesMedidas } from '@/types'
+import type { Configuracion, MaterialesTechoPorArea, MaterialesTecho, MedidaPlano, TallaPiso, TipoTecho, TotalesMedidas } from '@/types'
 
 export const STORAGE_KEY = 'techos-pisos-config'
 
@@ -11,8 +11,8 @@ const DEFAULT_CONFIG: Configuracion = {
   },
   techos: {
     tipos: [
-      { id: '1', nombre: 'Techo 30cm', largo: 595, ancho: 30, precioLamina: 27000, precioM2: 23000, m2: 1.8 },
-      { id: '2', nombre: 'Techo 25cm', largo: 595, ancho: 25, precioLamina: 25000, precioM2: 21000, m2: 1.5 },
+      { id: '1', nombre: 'Techo 30cm', largo: 595, ancho: 30, precioLamina: 27000, precioM2: 23000 },
+      { id: '2', nombre: 'Techo 25cm', largo: 595, ancho: 25, precioLamina: 25000, precioM2: 21000 },
     ],
   },
 }
@@ -78,7 +78,7 @@ export function guardarConfiguracion(config: Configuracion): void {
 }
 
 export const calcularMaterialesPorArea = (m2: number, areaPorLaminaPVC: number): MaterialesTechoPorArea => {
-  if (m2 <= 0 || areaPorLaminaPVC <= 0) {
+  if (!(m2 > 0) || !(areaPorLaminaPVC > 0)) {
     return {
       laminasPVC: 0,
       valorMaterialBruto: 0,
@@ -96,24 +96,32 @@ export const calcularMaterialesPorArea = (m2: number, areaPorLaminaPVC: number):
     laminasPVC,
     valorMaterialBruto: m2 / areaPorLaminaPVC,
     omegas: m2 / 2,
-    viguetas: (m2 / 2) / 2,
+    viguetas: m2 / 4,
     tornillosBlancos,
     tornillosNegros: tornillosBlancos / 2,
   }
 }
 
 export function calcularMaterialesTecho(
-  area: number
+  area: number,
+  perimetro?: number
 ): MaterialesTecho {
-  const perimetro = Math.sqrt(area) * 4
+  const areaValida = area > 0 ? area : 0
+  const perimetroReal = perimetro && perimetro > 0 ? perimetro : Math.sqrt(areaValida) * 4
   return {
-    perimetralPlastico: perimetro / 5.95,
-    angulos: perimetro / 2.44,
+    perimetralPlastico: perimetroReal / 5.95,
+    angulos: perimetroReal / 2.44,
   }
 }
 
 // Fórmulas
 export function calcularM2(largo: number, ancho: number): number { return largo * ancho }
+
+// Área (m²) que cubre una lámina, derivada de sus medidas en cm.
+export function areaLamina(tipo: TipoTecho): number {
+  if (!(tipo.largo > 0) || !(tipo.ancho > 0)) return 0
+  return calcularM2(tipo.largo / 100, tipo.ancho / 100)
+}
 export function calcularPrecioTotal(cantidad: number, precioUnitario: number): number {
   return cantidad * precioUnitario
 }
@@ -121,7 +129,7 @@ export function calcularPrecioTotal(cantidad: number, precioUnitario: number): n
 // Convierte el área a piezas completas según las medidas de la pieza (en cm).
 export function calcularPiezasPiso(areaM2: number, largoCm: number, anchoCm: number): number {
   const areaPieza = (largoCm / 100) * (anchoCm / 100)
-  if (areaM2 <= 0 || areaPieza <= 0) return 0
+  if (!(areaM2 > 0) || !(areaPieza > 0)) return 0
   return Math.ceil(areaM2 / areaPieza)
 }
 
@@ -156,7 +164,7 @@ export function calcularTotalesPiezas(piezas: MedidaPlano[]): TotalesMedidas {
       const esL = pieza.forma === "L"
       const recorteAncho = esL ? limitar(pieza.recorteAncho, ancho) : 0
       const recorteAlto = esL ? limitar(pieza.recorteAlto, alto) : 0
-      const area = Math.max(0, ancho * alto - recorteAncho * recorteAlto)
+      const area = Math.max(0, calcularM2(ancho, alto) - calcularM2(recorteAncho, recorteAlto))
 
       return {
         piezas: totales.piezas + cantidad,
