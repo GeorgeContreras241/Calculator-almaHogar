@@ -54,6 +54,7 @@ export function ConfigTechos() {
   }
 
   const handleEliminar = (id: string) => {
+    if (editandoId === id) setEditandoId(null)
     eliminarTipoTecho(id)
   }
 

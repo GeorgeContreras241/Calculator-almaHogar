@@ -44,6 +44,7 @@ export function ConfigPisos() {
   }
 
   const handleEliminar = (id: string) => {
+    if (editandoId === id) setEditandoId(null)
     eliminarTallaPiso(id)
   }
 
