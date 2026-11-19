@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { calcularM2, calcularPiezasPiso, calcularPrecioTotal, formatearMoneda, formatearNumero } from "@/lib/formulas"
+import { calcularM2, calcularPiezasPiso, calcularPrecioTotal, formatearMoneda } from "@/lib/formulas"
 import { useConfigStore } from "@/store/configStore"
 import type { ResultadoCalculo } from "@/types"
 import { Calculator, Settings } from "lucide-react"
@@ -25,15 +25,14 @@ export function CalculadoraPiso() {
     if (!talla) return
     if (modo === "medida") {
       const l = parseFloat(area.largo), a = parseFloat(area.ancho)
-      if (isNaN(l) || isNaN(a) || l <= 0 || a <= 0) return
-      const m2 = calcularM2(l, a)
-      const perimetroEstimado = (Math.sqrt(m2) * 4) / 2.44
-      setResultado({ areaM2: m2, perimetroM: perimetroEstimado })
+      if (isNaN(l) || isNaN(a) || l <= 0 || a <= 0) { setResultado(null); return }
+      // Con largo y ancho reales el perímetro es exacto, no una estimación.
+      setResultado({ areaM2: calcularM2(l, a), perimetroM: 2 * (l + a) })
     } else {
       const m2 = parseFloat(areaM)
-      if (isNaN(m2) || m2 <= 0) return
-      const perimetroEstimado = (Math.sqrt(m2) * 4) / 2.44
-      setResultado({ areaM2: m2, perimetroM: perimetroEstimado })
+      if (isNaN(m2) || m2 <= 0) { setResultado(null); return }
+      // Sin medidas solo se puede estimar el perímetro con un cuadrado equivalente.
+      setResultado({ areaM2: m2, perimetroM: Math.sqrt(m2) * 4 })
     }
   }
 
@@ -41,6 +40,10 @@ export function CalculadoraPiso() {
 
   const piezas = resultado && talla
     ? calcularPiezasPiso(resultado.areaM2, talla.largo, talla.ancho)
+    : 0
+
+  const guardaescobas = resultado?.perimetroM
+    ? resultado.perimetroM / 2.44
     : 0
 
   const opciones = tallas.map((t) => ({
@@ -103,7 +106,7 @@ export function CalculadoraPiso() {
                 <div className="font-medium text-foreground border-b border-border pb-1 mb-1">Resumen</div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Área:</span>
-                  <span className="font-medium">{formatearNumero(resultado.areaM2)} m²</span>
+                  <span className="font-medium">{resultado.areaM2.toFixed(2)} m²</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Modelo:</span>
@@ -118,8 +121,8 @@ export function CalculadoraPiso() {
                   <span className="font-medium">{piezas} piezas</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Guardaescobas estimado:</span>
-                  <span className="font-medium">{resultado.perimetroM?.toFixed(2)} piezas</span>
+                  <span className="text-muted-foreground">Guardaescobas:</span>
+                  <span className="font-medium">{guardaescobas.toFixed(2)} piezas</span>
                 </div>
 
                 <div className="border-t border-border pt-1 mt-1">
