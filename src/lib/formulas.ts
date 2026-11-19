@@ -5,8 +5,8 @@ export const STORAGE_KEY = 'techos-pisos-config'
 const DEFAULT_CONFIG: Configuracion = {
   pisos: {
     tallas: [
-      { id: '1', nombre: 'Techo L', largo: 60, ancho: 60, precioPorM2: 54000 },
-      { id: '2', nombre: 'Techo XL', largo: 80, ancho: 80, precioPorM2: 55000 },
+      { id: '1', nombre: 'Piso L', largo: 60, ancho: 60, precioPorM2: 54000 },
+      { id: '2', nombre: 'Piso XL', largo: 80, ancho: 80, precioPorM2: 55000 },
     ],
   },
   techos: {
