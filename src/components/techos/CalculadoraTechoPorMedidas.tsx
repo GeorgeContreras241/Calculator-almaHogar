@@ -2,10 +2,18 @@ import { useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { CardResult } from "@/components/ui/cardResult"
 import { PlanoTecho } from "@/components/techos/PlanoTecho"
-import { calcularTotalesPiezas } from "@/lib/formulas"
-import type { FormaPlano } from "@/types"
+import { ResultadoTecho } from "@/components/techos/ResultadoTecho"
+import {
+  areaLamina,
+  calcularMaterialesPorArea,
+  calcularMaterialesTecho,
+  calcularPrecioTotal,
+  calcularTotalesPiezas,
+  formatearMoneda,
+} from "@/lib/formulas"
+import { useConfigStore } from "@/store/configStore"
+import type { FormaPlano, Result } from "@/types"
 import { Plus, Trash2 } from "lucide-react"
 
 interface Pieza {
@@ -35,8 +43,10 @@ return{
 }
 
 export function CalculadoraTechoPorMedidas() {
+  const config = useConfigStore((s) => s.config)
   const siguienteId = useRef(2)
   const [piezas, setPiezas] = useState<Pieza[]>([filaVacia(1)])
+  const [tipoId, setTipoId] = useState("")
 
   const actualizar = (id: number, campo: CampoTexto, valor: string) => {
     setPiezas((prev) =>
@@ -75,12 +85,50 @@ export function CalculadoraTechoPorMedidas() {
         cantidad: Number.isNaN(cantidad) ? 1 : cantidad,
       }
     })
-    .filter((pieza) => pieza.ancho > 0 && pieza.alto > 0)
+    .filter((pieza) => pieza.ancho > 0 && pieza.alto > 0 && pieza.cantidad > 0)
 
   const totales = calcularTotalesPiezas(medidas)
 
+  const tipos = config.techos.tipos
+  const tipo = tipos.find((t) => t.id === tipoId) ?? tipos[0]
+  const areaPorLamina = tipo ? areaLamina(tipo) : 0
+
+  const resultado: Result | null =
+    tipo && totales.areaM2 > 0 && areaPorLamina > 0
+      ? {
+          precioUnitario: tipo.precioM2,
+          total: calcularPrecioTotal(totales.areaM2, tipo.precioM2),
+          areaM2: totales.areaM2,
+          perimetroM: totales.perimetroM,
+          modelo: `${tipo.largo}×${tipo.ancho} cm`,
+          materiales: calcularMaterialesPorArea(totales.areaM2, areaPorLamina),
+          perimetral: calcularMaterialesTecho(totales.areaM2, totales.perimetroM),
+        }
+      : null
+
   return (
     <div className="space-y-4">
+      <div className="space-y-1">
+        <span className="text-xs font-medium text-muted-foreground">Tipo de techo</span>
+        <div
+          role="group"
+          aria-label="Tipo de techo"
+          className={`grid text-xs font-medium border border-border rounded-md overflow-hidden text-muted-foreground ${tipos.length === 2 ? "grid-cols-2" : "grid-cols-1"}`}
+        >
+          {tipos.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              aria-pressed={tipo?.id === t.id}
+              className={`px-3 py-1.5 cursor-pointer transition-colors ${tipo?.id === t.id ? "bg-foreground/10 text-foreground" : "hover:bg-foreground/5"}`}
+              onClick={() => setTipoId(t.id)}
+            >
+              {t.nombre} - {formatearMoneda(t.precioLamina)} - {formatearMoneda(t.precioM2)}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="space-y-1">
         <h3 className="text-sm font-medium">Medidas del techo</h3>
         <p className="text-xs text-muted-foreground">
@@ -231,13 +279,15 @@ export function CalculadoraTechoPorMedidas() {
 
       <PlanoTecho piezas={medidas} className="mx-auto w-full max-w-md" />
 
-      {totales.piezas > 0 && (
-        <div className="rounded-lg border border-border p-3 space-y-1 bg-muted text-sm">
-          <div className="font-medium text-foreground border-b border-border pb-1 mb-1">Resumen</div>
-          <CardResult title="Piezas">{totales.piezas}</CardResult>
-          <CardResult title="Área total">{totales.areaM2.toFixed(2)} m²</CardResult>
-          <CardResult title="Perímetro">{totales.perimetroM.toFixed(2)} m</CardResult>
-        </div>
+      {resultado && tipo && (
+        <ResultadoTecho
+          resultado={resultado}
+          tipo={tipo}
+          modo="metro"
+          cantLaminas=""
+          m2={String(totales.areaM2)}
+          piezas={totales.piezas}
+        />
       )}
     </div>
   )
