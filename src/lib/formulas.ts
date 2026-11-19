@@ -170,5 +170,5 @@ export function calcularTotalesPiezas(piezas: MedidaPlano[]): TotalesMedidas {
   )
 }
 
-export function formatearMoneda(v: number): string { return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(v) }
+export function formatearMoneda(v: number): string { return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(v) }
 export function formatearNumero(v: number): string { return Math.round(v).toString() }
